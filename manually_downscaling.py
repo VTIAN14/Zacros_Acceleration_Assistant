@@ -82,13 +82,7 @@ def plot_bar_chart(input_file1, input_file2, output_file):
     
     fig, ax = plt.subplots(figsize=(10, 15))
     width, x = 0.6, np.arange(len(bar_labels))
-    
-    ax.barh(x + 1.5 * width / 4, bar_data[0], width / 4, label="Forward", color='blue')
-    ax.barh(x + 0.5 * width / 4, bar_data[1], width / 4, label="Reverse", color='red')
-    ax.barh(x - 0.5 * width / 4, bar_data[2], width / 4, label="Net (+)", color='green')
-    ax.barh(x - 1.5 * width / 4, bar_data[3], width / 4, label="Net (-)", color='orange')    
-    ax.axvline(1 / t, color='black', linestyle='--', linewidth=1)
-    
+
     ax.barh(x + 1.5 * width / 4, bar_data[0], width / 4, label="Forward", color='blue')
     ax.barh(x + 0.5 * width / 4, bar_data[1], width / 4, label="Reverse", color='red')
     ax.barh(x - 0.5 * width / 4, bar_data[2], width / 4, label="Net (+)", color='green')
