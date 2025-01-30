@@ -82,7 +82,7 @@ def plot_bar_chart(input_file1, input_file2, output_file):
     
     fig, ax = plt.subplots(figsize=(10, 15))
     width, x = 0.6, np.arange(len(bar_labels))
-
+    
     ax.barh(x + 1.5 * width / 4, bar_data[0], width / 4, label="Forward", color='blue')
     ax.barh(x + 0.5 * width / 4, bar_data[1], width / 4, label="Reverse", color='red')
     ax.barh(x - 0.5 * width / 4, bar_data[2], width / 4, label="Net (+)", color='green')
@@ -111,11 +111,14 @@ def generate_nscf_file(input_file1, input_file2, output_file):
     steps = []
     pscf = []
 
-    with open(input_file1, "r") as f:
+    with open(input_file1, "r") as f: # simulation_input.dat
         for line in f:
             if line.strip().startswith("max_steps"):
                 parts = line.split()
                 maxsteps = int(parts[1])
+            if line.strip().startswith("max_time"):
+                parts = line.split()
+                maxtime = float(parts[1])
 
     # 遍历文件提取数据
     with open(input_file2, "r") as f:
@@ -140,13 +143,17 @@ def generate_nscf_file(input_file1, input_file2, output_file):
         raise ValueError("Mismatch between steps and pscf lengths.")
 
     steps.insert(0, 'max_steps')
+    steps.insert(0, 'max_time')
     pscf.insert(0, maxsteps)
+    pscf.insert(0, maxtime)
 
     # 创建输出文件
     with open(output_file, "w") as f:
         for step, value in zip(steps, pscf):
             if step == 'max_steps':
-                f.write(f"{step:<30} {int(value):<10} {'default'}\n")
+                f.write(f"{step:<30} {int(value):<10} {int(value)}\n")
+            elif step == 'max_time':
+                f.write(f"{step:<30} {float(value):<10} {float(value)}\n")
             else:
                 f.write(f"{step:<30} {value:.2e}   {'1.00e-0'}\n")
 
@@ -156,7 +163,7 @@ def generate_nscf_file(input_file1, input_file2, output_file):
 def modify_mechanism_file(input_file1, input_file2, output_file):
 
     with open(input_file1, "r") as f:
-        nscf_values = [float(line.strip().split()[-1]) for i, line in enumerate(f, start=1) if i > 1 and line.strip()]
+        nscf_values = [float(line.strip().split()[-1]) for i, line in enumerate(f, start=1) if i > 2 and line.strip()]
 
     with open(input_file2, "r") as f:
         lines = f.readlines()
@@ -170,7 +177,7 @@ def modify_mechanism_file(input_file1, input_file2, output_file):
             if len(pre_expon_match) >= 3: # the third number a3
                 pre_expon = float(pre_expon_match[2])
                 nscf = nscf_values[nscf_index]
-                pre_expon_new = pre_expon + math.log(1/nscf)
+                pre_expon_new = pre_expon - math.log(nscf)
                 parts = line.split()
                 parts[3] = f'{pre_expon_new:.16e}'
                 line = "  "
@@ -208,8 +215,11 @@ def modify_mechanism_file(input_file1, input_file2, output_file):
 def modify_simulation_file(input_file1, input_file2, input_file3, output_file):
    
     with open(input_file1, "r") as f:
-        first_line = next(f).strip()  # 读取第一行
-        maxsteps = first_line.split()[-1]  # 获取第一行的最后一个值
+        
+        first_line = next(f).strip()  # 读取第1行
+        maxtime = first_line.split()[-1]  # 获取第1行的最后1个值
+        second_line = next(f).strip()  # 读取第2行
+        maxsteps = second_line.split()[-1]  # 获取第2行的最后1个值
   
     with open(input_file2, "r") as f:
         lines = f.readlines()
@@ -230,7 +240,12 @@ def modify_simulation_file(input_file1, input_file2, input_file3, output_file):
 
             if line.strip().startswith("max_steps"):
                 parts = line.split()
-                parts[1] = maxsteps if maxsteps != "default" else parts[1]
+                parts[1] = maxsteps 
+                line = "     ".join(parts) + "\n"
+            
+            if line.strip().startswith("max_time"):
+                parts = line.split()
+                parts[1] = maxtime
                 line = "     ".join(parts) + "\n"
 
             f.write(line)
