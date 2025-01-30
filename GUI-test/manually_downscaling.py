@@ -87,7 +87,7 @@ def plot_bar_chart(input_file1, input_file2, output_file):
     ax.barh(x + 0.5 * width / 4, bar_data[1], width / 4, label="Reverse", color='red')
     ax.barh(x - 0.5 * width / 4, bar_data[2], width / 4, label="Net (+)", color='green')
     ax.barh(x - 1.5 * width / 4, bar_data[3], width / 4, label="Net (-)", color='orange')    
-    ax.axvline(1 / t, color='black', linestyle='--', linewidth=1)
+    ax.axvline(1 / t, color='black', linestyle='--', linewidth=1, label="1/t")
     
     ax.set_xlabel("Event frequency / s⁻¹")
     ax.set_ylabel("Elementary step")
@@ -100,11 +100,10 @@ def plot_bar_chart(input_file1, input_file2, output_file):
             label.set_color("red")
     ax.set_xscale("log")  # 使用对数坐标轴
     ax.legend()
-    ax.grid(True, which="both", linestyle="--", linewidth=0.5)
-    
+    ax.grid(True, which="major", linestyle="--", linewidth=1.2, color="gray", alpha=1.0)
+    ax.grid(True, which="minor", linestyle="--", linewidth=0.5, color="gray", alpha=0.7) 
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-
-    
+  
 def generate_nscf_file(input_file1, input_file2, output_file):
 
     # 初始化列表
