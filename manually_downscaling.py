@@ -89,6 +89,12 @@ def plot_bar_chart(input_file1, input_file2, output_file):
     ax.barh(x - 1.5 * width / 4, bar_data[3], width / 4, label="Net (-)", color='orange')    
     ax.axvline(1 / t, color='black', linestyle='--', linewidth=1)
     
+    ax.barh(x + 1.5 * width / 4, bar_data[0], width / 4, label="Forward", color='blue')
+    ax.barh(x + 0.5 * width / 4, bar_data[1], width / 4, label="Reverse", color='red')
+    ax.barh(x - 0.5 * width / 4, bar_data[2], width / 4, label="Net (+)", color='green')
+    ax.barh(x - 1.5 * width / 4, bar_data[3], width / 4, label="Net (-)", color='orange')    
+    ax.axvline(1 / t, color='black', linestyle='-', linewidth=1, label="1/t")
+    
     ax.set_xlabel("Event frequency / s⁻¹")
     ax.set_ylabel("Elementary step")
     ax.set_yticks(x)
@@ -100,8 +106,9 @@ def plot_bar_chart(input_file1, input_file2, output_file):
             label.set_color("red")
     ax.set_xscale("log")  # 使用对数坐标轴
     ax.legend()
-    ax.grid(True, which="both", linestyle="--", linewidth=0.5)
-
+    #ax.grid(True, which="both", linestyle="--", linewidth=0.5)
+    ax.grid(True, which="major", linestyle="--", linewidth=1.2, color="gray", alpha=1.0)  # 主要网格线加粗
+    ax.grid(True, which="minor", linestyle="--", linewidth=0.5, color="gray", alpha=0.7)  # 次要网格线细一点
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
 
 def generate_nscf_file(input_file1, input_file2, output_file):
@@ -147,7 +154,7 @@ def generate_nscf_file(input_file1, input_file2, output_file):
             if step == 'max_steps':
                 f.write(f"{step:<30} {int(value):<10} {'default'}\n")
             else:
-                f.write(f"{step:<30} {value:.2e}   {'1.00e-00'}\n")
+                f.write(f"{step:<30} {value:.2e}   {'1.00e-0'}\n")
 
     # 提示完成
     print(f"Output file '{output_file}' created successfully.")
