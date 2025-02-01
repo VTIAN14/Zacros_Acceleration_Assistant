@@ -211,9 +211,9 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
     
     prats_eq_fwd_ratio_list = []
     prats_eq_rev_ratio_list = []
-    
+
     for i in range(nsteps):
-        if i !=sym_list:
+        if i not in sym_list:
             if max(step_fwd_number[i], step_rev_number[i]) < minnoccur:
                 prats_eq_fwd_ratio_list.append(1.0)
                 prats_eq_rev_ratio_list.append(1.0)
@@ -228,7 +228,7 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
             eq_rev_ratio = 0.5
             prats_eq_rev_ratio_list.append(eq_rev_ratio)
     
-    # print(lega_eq_fwd_ratio_list, lega_eq_rev_ratio_list, prats_eq_rev_ratio_list, prats_eq_rev_ratio_list)
+    # print(lega_eq_fwd_ratio_list, prats_eq_fwd_ratio_list)
     
     # the following block is used for finding the fastest non-eq step and eq-step and lowest eq-step
     
@@ -236,7 +236,7 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
     lega_fastest_neq_index = -1 # index of the fastest non equilibrium step
     lega_fastest_eq_number = 0 # max(max(ffwd, frev) for each step)
     lega_fastest_eq_index = -1 # index of the fastest eq step starts from 0
-    lega_lowest_eq_number = float('inf') # min(min(ffwd, frev) for each step)
+    lega_lowest_eq_number = float('inf') # mmin(min(ffwd, frev) for each step)
     lega_lowest_eq_index = -1 # index of the lowest eq step starts from 0
     
     for i in range(nsteps):
@@ -251,9 +251,9 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
                 lega_lowest_eq_number = min(lega_lowest_eq_number, min(step_fwd_number[i], step_rev_number[i]))
     
     lega_timescalesepgeomean = (lega_timescalesepmin * lega_timescalesepmax)**0.5
-    # lega_mindesiredtimescale = lega_timescalesepmin * lega_fastest_neq_delta_number
-    # lega_meandesiredtimescale = lega_timescalesepgeomean * lega_fastest_neq_delta_number
-    # lega_maxdesiredtimescale = lega_timescalesepmax * lega_fastest_neq_delta_number
+    lega_mindesiredtimescale = lega_timescalesepmin * lega_fastest_neq_delta_number
+    lega_meandesiredtimescale = lega_timescalesepgeomean * lega_fastest_neq_delta_number
+    lega_maxdesiredtimescale = lega_timescalesepmax * lega_fastest_neq_delta_number
     
     prats_fastest_neq_number = 0 # max(max(ffwd, bwd) for each non equilibrium step)
     prats_fastest_neq_index = -1 # index of the fastest non equilibrium step starts from 0
@@ -289,16 +289,20 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
     
     stop_prats_scaling = False
     for i in range(nsteps):
-        if (step_fwd_number[i] + step_rev_number[i] == 0):
+        if step_fwd_number[i] + step_rev_number[i] == 0 and pscf[i] < 1.0:
+            # print('up1', i)
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
-        elif (max(step_fwd_number[i], step_rev_number[i]) < minnoccur):
+        elif max(step_fwd_number[i], step_rev_number[i]) < minnoccur and pscf[i] < 1.0:
+            # print('up2', i)
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
-        elif (max(step_fwd_number[i], step_rev_number[i]) < prats_fastest_neq_number and prats_fastest_neq_number > 0):
+        elif max(step_fwd_number[i], step_rev_number[i]) < prats_fastest_neq_number and prats_fastest_neq_number > 0 and pscf[i] < 1.0:
+            # print('up3', i, max(step_fwd_number[i], step_rev_number[i]),prats_fastest_neq_number)
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
-        elif abs(lega_eq_fwd_ratio_list[i] - 0.5) > prats_reversibletol:
+        elif abs(prats_eq_fwd_ratio_list[i] - 0.5) > prats_reversibletol and pscf[i] < 1.0:
+            # print('up4', i, prats_eq_fwd_ratio_list[i])
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
     
@@ -306,25 +310,39 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
     
     if lega_fastest_neq_index == -1: # case(0)
         if lega_fastest_eq_number / lega_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
+            # print('lega_case0.0')
             for i in range(nsteps):
                 lega_nscf[i] = pscf[i] * lega_lowest_eq_number / step_fwd_number[i]
                 lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
         else: # case(0.1)
+            # print('lega_case0.1')
             for i in range(nsteps):
                 if step_fwd_number[i] + step_rev_number[i] != 0:
                     lega_nscf[i] = 1.0 / factorall * pscf[i]
     else: # case(1)
+        # print('lega_case1', lega_fastest_neq_index)
         for i in range(nsteps):
             if (step_fwd_number[i] + step_rev_number[i] > 0) and abs(lega_eq_fwd_ratio_list[i] - 0.5) < lega_reversibletol:
-                lega_nscf[i] = min(pscf[i] * lega_timescalesepgeomean * lega_fastest_neq_delta_number / min(step_fwd_number[i], step_rev_number[i]), 1.0)
-                lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
-    
+                if lega_mindesiredtimescale > min(step_fwd_number[i], step_rev_number[i]):
+                    # print(lega_mindesiredtimescale,min(step_fwd_number[i], step_rev_number[i]))
+                    lega_nscf[i] = min(pscf[i] * lega_meandesiredtimescale / min(step_fwd_number[i], step_rev_number[i]), 1.0)
+                    lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
+                    # print(i, lega_nscf[i] * min(step_fwd_number[i], step_rev_number[i]))
+                if lega_maxdesiredtimescale < min(step_fwd_number[i], step_rev_number[i]):
+                    # print(lega_maxdesiredtimescale,min(step_fwd_number[i], step_rev_number[i]))
+                    lega_nscf[i] = pscf[i] * lega_meandesiredtimescale / min(step_fwd_number[i], step_rev_number[i])
+                    lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
+                    # print(i, lega_nscf[i] * min(step_fwd_number[i], step_rev_number[i]))
+                
+    # print(stop_prats_scaling)
     if stop_prats_scaling == False:
         if prats_fastest_neq_index == -1: # case(0)
+            # print('prats_case0')
             if prats_fastest_eq_number / prats_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
                 for i in range(nsteps):
                     prats_nscf[i] = pscf[i] * max(meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / downscalinglimit)
         else: # case(1)
+            # print('prats_case1')
             if prats_fastest_eq_number > maxdesiredtimescale:
                 prats_nscf[prats_fastest_eq_index] = pscf[prats_fastest_eq_index] * max(meandesiredtimescale / prats_fastest_eq_number, 1.0 / downscalinglimit)
             for i in range(nsteps):
@@ -470,7 +488,6 @@ def generate_nscf_file(input_file1, input_file2, lega_nscf, prats_nscf, output_f
     # 确保 steps 和 pscf 长度一致
     if len(steps) != len(pscf) or len(lega_nscf) != len(prats_nscf) or len(pscf) != len(prats_nscf):
         raise ValueError("Mismatch between steps and pscf lengths.")
-
 
     steps[:0] = ['max_time', 'max_steps']
     pscf[:0] = [maxtime, maxsteps]
