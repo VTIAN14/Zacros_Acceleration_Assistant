@@ -10,7 +10,7 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
    
     if not os.path.exists(input_file1):
         with open(input_file1, "w") as f:
-            f.write("")
+            f.write(" ")
         print(f"{input_file1} has been created")
         
     #legacy
