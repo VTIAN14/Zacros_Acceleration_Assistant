@@ -5,6 +5,332 @@ import math
 import os
 import shutil
 
+
+def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3):
+    
+    #legacy
+    maxallowedfastquasiequisepar = -1
+    stiffnscalingthreshold = -1
+    factorall = -1
+    lega_reversibletol = -1
+    lega_timescalesepmin = -1
+    lega_timescalesepmax = -1
+    
+    #prats2024
+    prats_reversibletol = -1
+    minnoccur = -1
+    upscalingfactor = -1
+    upscalinglimit = -1
+    downscalinglimit = -1
+    prats_timescalesepmin = -1
+    prats_timescalesepmax = -1
+        
+    with open(input_file1, "r") as f: # downscaling_algorithm_file
+    
+        for line in f:        
+            if line.strip().startswith("max_qequil_separation"):
+                parts = line.split()
+                if len(parts) > 1:
+                    maxallowedfastquasiequisepar = float(parts[1])                
+            if line.strip().startswith("stiffn_coeff_threshold"):
+                parts = line.split()
+                if len(parts) > 1:
+                    stiffnscalingthreshold = float(parts[1])               
+            if line.strip().startswith("scaling_factor"):
+                parts = line.split()
+                if len(parts) > 1:
+                    factorall = float(parts[1])               
+            if line.strip().startswith("legacy_tol_part_equil_ratio"):
+                parts = line.split()
+                if len(parts) > 1:
+                    lega_reversibletol = float(parts[1])                
+            if line.strip().startswith("legacy_min_separation"):
+                parts = line.split()
+                if len(parts) > 1:
+                    lega_timescalesepmin = float(parts[1])                
+            if line.strip().startswith("legacy_max_separation"):
+                parts = line.split()
+                if len(parts) > 1:
+                    lega_timescalesepmax = float(parts[1])
+                         
+            if line.strip().startswith("upscaling_factor"):
+                parts = line.split()
+                if len(parts) > 1:
+                    upscalingfactor = float(parts[1])       
+            if line.strip().startswith("upscaling_limit"):
+                parts = line.split()
+                if len(parts) > 1:
+                    upscalinglimit = float(parts[1])            
+            if line.strip().startswith("downscaling_limit"):
+                parts = line.split()
+                if len(parts) > 1:
+                    downscalinglimit = float(parts[1])         
+            if line.strip().startswith("prats_tol_part_equil_ratio"):
+                parts = line.split()
+                if len(parts) > 1:
+                    prats_reversibletol = float(parts[1])           
+            if line.strip().startswith("prats_min_separation"):
+                parts = line.split()
+                if len(parts) > 1:
+                    prats_timescalesepmin = float(parts[1])       
+            if line.strip().startswith("prats_max_separation"):
+                parts = line.split()
+                if len(parts) > 1:
+                    prats_timescalesepmax = float(parts[1])
+            if line.strip().startswith("min_noccur"):
+                parts = line.split()
+                if len(parts) > 1:
+                    minnoccur = float(parts[1]) 
+    
+    with open(input_file1, "a") as f: # downscaling_algorithm_file
+        if maxallowedfastquasiequisepar < 0:
+            maxallowedfastquasiequisepar = 5
+            f.writelines('max_qequil_separation ' + str(maxallowedfastquasiequisepar) + '\n')
+        if stiffnscalingthreshold < 0:
+            stiffnscalingthreshold = 0.02
+            f.writelines('stiffn_coeff_threshold ' + str(stiffnscalingthreshold) + '\n')
+        if factorall < 0:
+            factorall = 5
+            f.writelines('scaling_factor ' + str(factorall) + '\n')
+        if lega_reversibletol < 0:
+            lega_reversibletol = 0.05
+            f.writelines('legacy_tol_part_equil_ratio ' + str(lega_reversibletol) + '\n')
+        if lega_timescalesepmin < 0:
+            lega_timescalesepmin = 49
+            f.writelines('legacy_min_separation ' + str(lega_timescalesepmin) + '\n')
+        if lega_timescalesepmax < 0:
+            lega_timescalesepmax = 100
+            f.writelines('legacy_max_separation ' + str(lega_timescalesepmax) + '\n')
+
+        if upscalingfactor < 0:
+            upscalingfactor = 5
+            f.writelines('upscaling_factor ' + str(upscalingfactor) + '\n')
+        if upscalinglimit < 0:
+            upscalinglimit = 100
+            f.writelines('upscaling_limit ' + str(upscalinglimit) + '\n')
+        if downscalinglimit < 0:
+            downscalinglimit = 2
+            f.writelines('downscaling_limit ' + str(downscalinglimit) + '\n')
+        if prats_reversibletol < 0:
+            prats_reversibletol = 0.05
+            f.writelines('prats_tol_part_equil_ratio ' + str(prats_reversibletol) + '\n')
+        if prats_timescalesepmin < 0:
+            prats_timescalesepmin = 49
+            f.writelines('prats_min_separation ' + str(prats_timescalesepmin) + '\n')
+        if prats_timescalesepmax < 0:
+            prats_timescalesepmax = 100
+            f.writelines('prats_max_separation ' + str(prats_timescalesepmax) + '\n')
+        if minnoccur < 0:
+            minnoccur = int((prats_reversibletol + 0.5) / (2.0 * prats_reversibletol))
+            f.writelines('min_noccur ' + str(minnoccur) + '\n')
+    
+    # this block is used for deleting the keyword without any numbers after it
+    with open(input_file1, "r") as f: 
+        lines = f.readlines()            
+    with open(input_file1, "w") as f:
+        line.strip()
+        for line in lines:
+            parts = line.split()
+            if len(parts) == 2:  # 只写入不包含该文本的行
+                f.write(line)
+                
+    with open(input_file2, "r") as f: # mechanism_input.dat, not support for irreversible steps at the moment
+    
+        steps_fwd = []
+        steps_rev = []
+        steps_sym = []
+        pscf = []
+        lega_nscf = []
+        prats_nscf = []
+        
+        for line in f:
+            # 提取 'reversible_step' 后的字符串
+            if line.strip().startswith("reversible_step"):
+                parts = line.split()
+                if len(parts) > 1:
+                    parts[1] = parts[1]
+                    steps_fwd.append(parts[1])
+                    parts[1] = parts[1]
+                    steps_rev.append(parts[1])
+            if line.strip().startswith('stiffness_scalable_symmetric'):
+                steps_sym.append(parts[1].removesuffix("_rev"))
+            if line.strip().startswith("# Stiff Scaling ="):
+                parts = line.split()
+                pscf_value = float(parts[-1])  # 将最后一部分转换为浮点数（支持科学计数法）
+                pscf.append(pscf_value)
+                lega_nscf.append(pscf_value)
+                prats_nscf.append(pscf_value)
+    
+    # print(len(steps_fwd), steps_rev, steps_sym, len(pscf))
+    
+    sym_list = []
+    for i in range(len(steps_sym)):
+        index = steps_fwd.index(steps_sym[i])
+        sym_list.append(index)
+    
+    with open(input_file3, "r") as f: # procstat_output.txt
+        lines = f.readlines()
+    
+        config_index = next(i for i in range(len(lines) - 1, -1, -1) if "configuration" in lines[i])
+        
+        data_line = list(map(int, lines[config_index + 2].split()[1:]))  # 读取第二行除第一个外的所有整数
+        step_fwd_number = [data_line[i] for i in range(len(data_line)) if i % 2 == 0]  # 单数索引 (0, 2, 4, ...)
+        step_rev_number = [data_line[i] for i in range(len(data_line)) if i % 2 == 1]  # 双数索引 (1, 3, 5, ...)
+        # step_sym_fwd_number = [step_fwd_number[i] for i in range(len(data_line)) if i in sym_list]  # sym_step index
+        # step_sym_rev_number = [step_rev_number[i] for i in range(len(data_line)) if i in sym_list]
+                
+    return maxallowedfastquasiequisepar, stiffnscalingthreshold, factorall, lega_reversibletol, lega_timescalesepmin, lega_timescalesepmax, \
+           minnoccur, upscalingfactor, upscalinglimit, downscalinglimit, prats_reversibletol, prats_timescalesepmin, prats_timescalesepmax, \
+           pscf, sym_list, step_fwd_number, step_rev_number           
+
+def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthreshold, factorall, lega_reversibletol, lega_timescalesepmin, lega_timescalesepmax, \
+                                  minnoccur, upscalingfactor, upscalinglimit, downscalinglimit, prats_reversibletol, prats_timescalesepmin, prats_timescalesepmax, \
+                                  pscf, sym_list, step_fwd_number, step_rev_number):
+    
+    nsteps = len(pscf)
+    lega_nscf = []
+    prats_nscf = []
+    for i in range(nsteps):        
+        lega_nscf.append(pscf[i])
+        prats_nscf.append(pscf[i])
+    lega_eq_fwd_ratio_list = []
+    lega_eq_rev_ratio_list = []
+    
+    for i in range(nsteps):
+        if max(step_fwd_number[i], step_rev_number[i]) == 0:
+            lega_eq_fwd_ratio_list.append(0.5)
+            lega_eq_rev_ratio_list.append(0.5)
+        else:
+            eq_fwd_ratio = step_fwd_number[i]/(step_fwd_number[i] + step_rev_number[i])
+            lega_eq_fwd_ratio_list.append(eq_fwd_ratio)
+            eq_rev_ratio = step_rev_number[i]/(step_fwd_number[i] + step_rev_number[i])
+            lega_eq_rev_ratio_list.append(eq_fwd_ratio)
+    
+    prats_eq_fwd_ratio_list = []
+    prats_eq_rev_ratio_list = []
+    
+    for i in range(nsteps):
+        if i !=sym_list:
+            if max(step_fwd_number[i], step_rev_number[i]) < minnoccur:
+                prats_eq_fwd_ratio_list.append(1.0)
+                prats_eq_rev_ratio_list.append(1.0)
+            else:
+                eq_fwd_ratio = step_fwd_number[i]/(step_fwd_number[i] + step_rev_number[i])
+                prats_eq_fwd_ratio_list.append(eq_fwd_ratio)
+                eq_rev_ratio = step_rev_number[i]/(step_fwd_number[i] + step_rev_number[i])
+                prats_eq_rev_ratio_list.append(eq_fwd_ratio)
+        else:
+            eq_fwd_ratio = 0.5
+            prats_eq_fwd_ratio_list.append(eq_fwd_ratio)
+            eq_rev_ratio = 0.5
+            prats_eq_rev_ratio_list.append(eq_rev_ratio)
+    
+    # print(lega_eq_fwd_ratio_list, lega_eq_rev_ratio_list, prats_eq_rev_ratio_list, prats_eq_rev_ratio_list)
+    
+    # the following block is used for finding the fastest non-eq step and eq-step and lowest eq-step
+    
+    lega_fastest_neq_delta_number = 0 # max(|ffwd - frev| for each non equilibrium step)
+    lega_fastest_neq_index = -1 # index of the fastest non equilibrium step
+    lega_fastest_eq_number = 0 # max(max(ffwd, frev) for each step)
+    lega_fastest_eq_index = -1 # index of the fastest eq step starts from 0
+    lega_lowest_eq_number = float('inf') # mmin(min(ffwd, frev) for each step)
+    lega_lowest_eq_index = -1 # index of the lowest eq step starts from 0
+    
+    for i in range(nsteps):
+        if (abs(lega_eq_fwd_ratio_list[i]-0.5) > lega_reversibletol):
+            lega_fastest_neq_index = i if lega_fastest_neq_delta_number < abs(step_fwd_number[i] - step_rev_number[i]) else lega_fastest_neq_index
+            lega_fastest_neq_delta_number = max(lega_fastest_neq_delta_number, abs(step_fwd_number[i] - step_rev_number[i]))
+        else:
+            if step_fwd_number[i] + step_rev_number[i] > 0:
+                lega_fastest_eq_index = i if lega_fastest_eq_number < max(step_fwd_number[i], step_rev_number[i]) else lega_fastest_eq_index
+                lega_fastest_eq_number = max(lega_fastest_eq_number, max(step_fwd_number[i], step_rev_number[i]))
+                lega_lowest_eq_index = i if lega_lowest_eq_number > min(step_fwd_number[i], step_rev_number[i]) else lega_lowest_eq_index
+                lega_lowest_eq_number = min(lega_lowest_eq_number, min(step_fwd_number[i], step_rev_number[i]))
+    
+    lega_timescalesepgeomean = (lega_timescalesepmin * lega_timescalesepmax)**0.5
+    # lega_mindesiredtimescale = lega_timescalesepmin * lega_fastest_neq_delta_number
+    # lega_meandesiredtimescale = lega_timescalesepgeomean * lega_fastest_neq_delta_number
+    # lega_maxdesiredtimescale = lega_timescalesepmax * lega_fastest_neq_delta_number
+    
+    prats_fastest_neq_number = 0 # max(max(ffwd, bwd) for each non equilibrium step)
+    prats_fastest_neq_index = -1 # index of the fastest non equilibrium step starts from 0
+    prats_fastest_eq_number = 0 
+    prats_fastest_eq_index = -1 # index of the fastest eq step starts from 0
+    prats_lowest_eq_number = float('inf')
+    prats_lowest_eq_index = -1 # index of the fastest eq step starts from 0
+    
+    for i in range(nsteps):
+        if (abs(prats_eq_fwd_ratio_list[i]-0.5) > prats_reversibletol):
+            prats_fastest_neq_index = i if prats_fastest_neq_number < max(step_fwd_number[i], step_rev_number[i]) else prats_fastest_neq_index
+            prats_fastest_neq_number = max(prats_fastest_neq_number, max(step_fwd_number[i], step_rev_number[i]))
+        else:
+            prats_fastest_eq_index = i if prats_fastest_eq_number < max(step_fwd_number[i], step_rev_number[i]) else prats_fastest_eq_index
+            prats_fastest_eq_number = max(prats_fastest_eq_number, max(step_fwd_number[i], step_rev_number[i]))
+            prats_lowest_eq_index = i if prats_lowest_eq_number > min(step_fwd_number[i], step_rev_number[i]) else prats_lowest_eq_index
+            prats_lowest_eq_number = min(prats_lowest_eq_number, min(step_fwd_number[i], step_rev_number[i]))
+    
+    prats_timescalesepgeomean = (prats_timescalesepmin * prats_timescalesepmax)**0.5
+    mindesiredtimescale = prats_timescalesepmin * max(prats_fastest_neq_number, minnoccur)
+    meandesiredtimescale = prats_timescalesepgeomean * max(prats_fastest_neq_number, minnoccur)
+    maxdesiredtimescale = prats_timescalesepmax * max(prats_fastest_neq_number, minnoccur)
+            
+    # the following block is used for finding overly downscaling steps and upscaling them  
+    
+    for i in range(nsteps):
+        # if pscf[i] < stiffnscalingthreshold and abs(lega_eq_fwd_ratio_list[i] - 0.5) > lega_reversibletol:
+        if pscf[i] < 1.0 and (abs(lega_eq_fwd_ratio_list[i] - 0.5) > lega_reversibletol or step_fwd_number[i] + step_rev_number[i] == 0):
+            lega_nscf[i] = min(1.0, factorall * pscf[i])
+            lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
+    
+    #print(pscf, lega_nscf)
+    
+    stop_prats_scaling = False
+    for i in range(nsteps):
+        if (step_fwd_number[i] + step_rev_number[i] == 0):
+            prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
+            stop_prats_scaling = True
+        elif (max(step_fwd_number[i], step_rev_number[i]) < minnoccur):
+            prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
+            stop_prats_scaling = True
+        elif (max(step_fwd_number[i], step_rev_number[i]) < prats_fastest_neq_number and prats_fastest_neq_number > 0):
+            prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
+            stop_prats_scaling = True
+        elif abs(lega_eq_fwd_ratio_list[i] - 0.5) > prats_reversibletol:
+            prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
+            stop_prats_scaling = True
+    
+    # the following block is used for case 0 (no non-eq step)
+    
+    if lega_fastest_neq_index == -1: # case(0)
+        if lega_fastest_eq_number / lega_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
+            for i in range(nsteps):
+                lega_nscf[i] = pscf[i] * lega_lowest_eq_number / step_fwd_number[i]
+                lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
+        else: # case(0.1)
+            for i in range(nsteps):
+                if step_fwd_number[i] + step_rev_number[i] != 0:
+                    lega_nscf[i] = 1.0 / factorall * pscf[i]
+    else: # case(1)
+        for i in range(nsteps):
+            if (step_fwd_number[i] + step_rev_number[i] > 0) and abs(lega_eq_fwd_ratio_list[i] - 0.5) < 0:
+                lega_nscf[i] = min(pscf[i] * lega_timescalesepgeomean * lega_fastest_neq_delta_number / min(step_fwd_number[i], step_rev_number[i]), 1.0)
+                lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
+    
+    if stop_prats_scaling == False:
+        if prats_fastest_neq_index == -1: # case(0)
+            if prats_fastest_eq_number / prats_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
+                for i in range(nsteps):
+                    prats_nscf[i] = pscf[i] * max(meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / downscalinglimit)
+        else: # case(1)
+            if prats_fastest_eq_number > maxdesiredtimescale:
+                prats_nscf[prats_fastest_eq_index] = pscf[prats_fastest_eq_index] * max(meandesiredtimescale / prats_fastest_eq_number, 1.0 / downscalinglimit)
+            for i in range(nsteps):
+                if abs(prats_eq_fwd_ratio_list[i] - 0.5) < 0 and max(step_fwd_number, step_rev_number) < mindesiredtimescale:
+                    prats_nscf[i] = min(pscf[i] * max(meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / upscalinglimit), 1.0)
+
+    # print(lega_nscf, prats_nscf)
+    return lega_nscf, prats_nscf
+
 def parse_history_file(input_file, output_file):
     with open(input_file, "r") as f:
         lines = f.readlines()
@@ -105,7 +431,7 @@ def plot_bar_chart(input_file1, input_file2, output_file):
     ax.grid(True, which="minor", linestyle="--", linewidth=0.5, color="gray", alpha=0.7)  # 次要网格线细一点
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
 
-def generate_nscf_file(input_file1, input_file2, output_file):
+def generate_nscf_file(input_file1, input_file2, lega_nscf, prats_nscf, output_file):
 
     # 初始化列表
     steps = []
@@ -139,33 +465,35 @@ def generate_nscf_file(input_file1, input_file2, output_file):
                     pass
 
     # 确保 steps 和 pscf 长度一致
-    if len(steps) != len(pscf):
+    if len(steps) != len(pscf) or len(lega_nscf) != len(prats_nscf) or len(pscf) != len(prats_nscf):
         raise ValueError("Mismatch between steps and pscf lengths.")
 
     steps.insert(0, 'max_steps')
     steps.insert(0, 'max_time')
     pscf.insert(0, maxsteps)
     pscf.insert(0, maxtime)
+    lega_nscf.insert(0, '')
+    prats_nscf.insert(0, '')
 
     # 创建输出文件
     with open(output_file, "w") as f:
-        for step, value in zip(steps, pscf):
+        for step, value1, value2, value3 in zip(steps, pscf, lega_nscf, prats_nscf):
             if step == 'max_steps':
-                f.write(f"{step:<30} {int(value):<10} {int(value)}\n")
+                f.write(f"{step:<30} {int(value1):<10} {int(value1)}\n")
             elif step == 'max_time':
-                f.write(f"{step:<30} {float(value):<10} {float(value)}\n")
+                f.write(f"{step:<30} {float(value1):<10} {float(value1)}\n")
             else:
-                f.write(f"{step:<30} {value:.2e}   {'1.00e-0'}\n")
+                f.write(f"{step:<30} {value1:.2e} {value2:.2e} {value3:.2e}   {'1.00e-0'}\n")
 
     # 提示完成
     print(f"Output file '{output_file}' created successfully.")
 
 def modify_mechanism_file(input_file1, input_file2, output_file):
 
-    with open(input_file1, "r") as f:
+    with open(input_file1, "r") as f: # nscf.dat
         nscf_values = [float(line.strip().split()[-1]) for i, line in enumerate(f, start=1) if i > 2 and line.strip()]
 
-    with open(input_file2, "r") as f:
+    with open(input_file2, "r") as f: # mechanism_input.dat
         lines = f.readlines()
     modified_lines = []
     nscf_index = 0
