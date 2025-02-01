@@ -11,5 +11,9 @@ input_file3 = "simulation_input.dat"
 output_file = "simulation_input_modified.dat"
 manually_downscaling.modify_simulation_file(input_file1, input_file2, input_file3, output_file)
 
+input_file = "history_output.txt"
+output_file = "state_input_last.dat"
+manually_downscaling.parse_history_file(input_file, output_file)
+
 input_file = "simulation_input_modified.dat"
 manually_downscaling.copy_and_rename_files(input_file)
