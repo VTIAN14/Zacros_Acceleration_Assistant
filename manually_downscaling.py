@@ -5,12 +5,13 @@ import math
 import os
 import shutil
 
-def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3):
-    
+def perform_stiffness_downscaling(input_file1, input_file2, input_file3): 
+# def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3):
+   
     if not os.path.exists(input_file1):
         with open(input_file1, "w") as f:
             f.write("")
-        print(f"{input_file1} has been created.")
+        print(f"{input_file1} has been created")
         
     #legacy
     maxallowedfastquasiequisepar = -1
@@ -180,13 +181,13 @@ def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3
         # step_sym_fwd_number = [step_fwd_number[i] for i in range(len(data_line)) if i in sym_list]  # sym_step index
         # step_sym_rev_number = [step_rev_number[i] for i in range(len(data_line)) if i in sym_list]
                 
-    return maxallowedfastquasiequisepar, stiffnscalingthreshold, factorall, lega_reversibletol, lega_timescalesepmin, lega_timescalesepmax, \
-           minnoccur, upscalingfactor, upscalinglimit, downscalinglimit, prats_reversibletol, prats_timescalesepmin, prats_timescalesepmax, \
-           pscf, sym_list, step_fwd_number, step_rev_number           
+#     return maxallowedfastquasiequisepar, stiffnscalingthreshold, factorall, lega_reversibletol, lega_timescalesepmin, lega_timescalesepmax, \
+#            minnoccur, upscalingfactor, upscalinglimit, downscalinglimit, prats_reversibletol, prats_timescalesepmin, prats_timescalesepmax, \
+#            pscf, sym_list, step_fwd_number, step_rev_number           
 
-def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthreshold, factorall, lega_reversibletol, lega_timescalesepmin, lega_timescalesepmax, \
-                                  minnoccur, upscalingfactor, upscalinglimit, downscalinglimit, prats_reversibletol, prats_timescalesepmin, prats_timescalesepmax, \
-                                  pscf, sym_list, step_fwd_number, step_rev_number):
+# def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthreshold, factorall, lega_reversibletol, lega_timescalesepmin, lega_timescalesepmax, \
+#                                   minnoccur, upscalingfactor, upscalinglimit, downscalinglimit, prats_reversibletol, prats_timescalesepmin, prats_timescalesepmax, \
+#                                   pscf, sym_list, step_fwd_number, step_rev_number):
     
     nsteps = len(pscf)
     lega_nscf = []
@@ -496,7 +497,7 @@ def generate_nscf_file(input_file1, input_file2, lega_nscf, prats_nscf, output_f
 def modify_mechanism_file(input_file1, input_file2, output_file):
 
     with open(input_file1, "r") as f: # nscf.dat
-        nscf_values = [float(line.strip().split()[-1]) for i, line in enumerate(f, start=1) if i > 2 and line.strip()]
+        nscf_values = [float(line.strip().split()[-1]) for i, line in enumerate(f, start=1) if i > 4 and line.strip()]
 
     with open(input_file2, "r") as f: # mechanism_input.dat
         lines = f.readlines()
