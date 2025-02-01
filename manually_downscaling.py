@@ -8,6 +8,11 @@ import shutil
 
 def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3):
     
+    if not os.path.exists(input_file1):
+        with open(input_file1, "w") as f:
+            f.write("")
+        print(f"{input_file1} has been created")
+        
     #legacy
     maxallowedfastquasiequisepar = -1
     stiffnscalingthreshold = -1
@@ -140,8 +145,6 @@ def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3
         steps_rev = []
         steps_sym = []
         pscf = []
-        lega_nscf = []
-        prats_nscf = []
         
         for line in f:
             # 提取 'reversible_step' 后的字符串
@@ -158,10 +161,9 @@ def parse_stiffness_downscaling_input_file(input_file1, input_file2, input_file3
                 parts = line.split()
                 pscf_value = float(parts[-1])  # 将最后一部分转换为浮点数（支持科学计数法）
                 pscf.append(pscf_value)
-                lega_nscf.append(pscf_value)
-                prats_nscf.append(pscf_value)
     
     # print(len(steps_fwd), steps_rev, steps_sym, len(pscf))
+    # print(pscf)
     
     sym_list = []
     for i in range(len(steps_sym)):
@@ -189,10 +191,11 @@ def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthr
     
     nsteps = len(pscf)
     lega_nscf = []
-    prats_nscf = []
+    prats_nscf = []  
     for i in range(nsteps):        
         lega_nscf.append(pscf[i])
         prats_nscf.append(pscf[i])
+        
     lega_eq_fwd_ratio_list = []
     lega_eq_rev_ratio_list = []
     
@@ -282,7 +285,7 @@ def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthr
             lega_nscf[i] = min(1.0, factorall * pscf[i])
             lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
     
-    #print(pscf, lega_nscf)
+    # print(pscf, lega_nscf)
     
     stop_prats_scaling = False
     for i in range(nsteps):
@@ -312,7 +315,7 @@ def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthr
                     lega_nscf[i] = 1.0 / factorall * pscf[i]
     else: # case(1)
         for i in range(nsteps):
-            if (step_fwd_number[i] + step_rev_number[i] > 0) and abs(lega_eq_fwd_ratio_list[i] - 0.5) < 0:
+            if (step_fwd_number[i] + step_rev_number[i] > 0) and abs(lega_eq_fwd_ratio_list[i] - 0.5) < lega_reversibletol:
                 lega_nscf[i] = min(pscf[i] * lega_timescalesepgeomean * lega_fastest_neq_delta_number / min(step_fwd_number[i], step_rev_number[i]), 1.0)
                 lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
     
@@ -325,7 +328,7 @@ def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthr
             if prats_fastest_eq_number > maxdesiredtimescale:
                 prats_nscf[prats_fastest_eq_index] = pscf[prats_fastest_eq_index] * max(meandesiredtimescale / prats_fastest_eq_number, 1.0 / downscalinglimit)
             for i in range(nsteps):
-                if abs(prats_eq_fwd_ratio_list[i] - 0.5) < 0 and max(step_fwd_number, step_rev_number) < mindesiredtimescale:
+                if abs(prats_eq_fwd_ratio_list[i] - 0.5) < prats_reversibletol and max(step_fwd_number[i], step_rev_number[i]) < mindesiredtimescale:
                     prats_nscf[i] = min(pscf[i] * max(meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / upscalinglimit), 1.0)
 
     # print(lega_nscf, prats_nscf)
@@ -468,22 +471,25 @@ def generate_nscf_file(input_file1, input_file2, lega_nscf, prats_nscf, output_f
     if len(steps) != len(pscf) or len(lega_nscf) != len(prats_nscf) or len(pscf) != len(prats_nscf):
         raise ValueError("Mismatch between steps and pscf lengths.")
 
-    steps.insert(0, 'max_steps')
-    steps.insert(0, 'max_time')
-    pscf.insert(0, maxsteps)
-    pscf.insert(0, maxtime)
-    lega_nscf.insert(0, '')
-    prats_nscf.insert(0, '')
+
+    steps[:0] = ['max_time', 'max_steps']
+    pscf[:0] = [maxtime, maxsteps]
+    #pscf.insert(0, maxsteps)
+    #pscf.insert(0, maxtime)
+    lega_nscf[:0] = ['', '']
+    prats_nscf[:0] = ['', '']
 
     # 创建输出文件
     with open(output_file, "w") as f:
         for step, value1, value2, value3 in zip(steps, pscf, lega_nscf, prats_nscf):
             if step == 'max_steps':
-                f.write(f"{step:<30} {int(value1):<10} {int(value1)}\n")
+                f.write(f"{step:<26} {int(value1):<12} {int(value1)}\n")
+                f.write("\n")
+                f.write('Step                       Factor       Legacy       Prats2024\n')
             elif step == 'max_time':
-                f.write(f"{step:<30} {float(value1):<10} {float(value1)}\n")
+                f.write(f"{step:<26} {float(value1):<12} {float(value1)}\n")
             else:
-                f.write(f"{step:<30} {value1:.2e} {value2:.2e} {value3:.2e}   {'1.00e-0'}\n")
+                f.write(f"{step:<26} {value1:.2e}     {value2:.2e}     {value3:.2e}     {'1.00e-0'}\n")
 
     # 提示完成
     print(f"Output file '{output_file}' created successfully.")
