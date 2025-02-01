@@ -10,11 +10,11 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
    
     if not os.path.exists(input_file1):
         with open(input_file1, "w") as f:
-            f.write(" ")
+            f.write("\n")
         print(f"{input_file1} has been created")
     else:
         with open(input_file1, "a") as f:
-            f.write(" ")
+            f.write("\n")
 
     #legacy
     maxallowedfastquasiequisepar = -1
