@@ -273,9 +273,9 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
             prats_lowest_eq_number = min(prats_lowest_eq_number, min(step_fwd_number[i], step_rev_number[i]))
     
     prats_timescalesepgeomean = (prats_timescalesepmin * prats_timescalesepmax)**0.5
-    mindesiredtimescale = prats_timescalesepmin * max(prats_fastest_neq_number, minnoccur)
-    meandesiredtimescale = prats_timescalesepgeomean * max(prats_fastest_neq_number, minnoccur)
-    maxdesiredtimescale = prats_timescalesepmax * max(prats_fastest_neq_number, minnoccur)
+    prats_mindesiredtimescale = prats_timescalesepmin * max(prats_fastest_neq_number, minnoccur)
+    prats_meandesiredtimescale = prats_timescalesepgeomean * max(prats_fastest_neq_number, minnoccur)
+    prats_maxdesiredtimescale = prats_timescalesepmax * max(prats_fastest_neq_number, minnoccur)
             
     # the following block is used for finding overly downscaling steps and upscaling them  
     
@@ -297,7 +297,7 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
             # print('up2', i)
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
-        elif max(step_fwd_number[i], step_rev_number[i]) < prats_fastest_neq_number and prats_fastest_neq_number > 0 and pscf[i] < 1.0:
+        elif max(step_fwd_number[i], step_rev_number[i]) < prats_fastest_neq_number and pscf[i] < 1.0:
             # print('up3', i, max(step_fwd_number[i], step_rev_number[i]),prats_fastest_neq_number)
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
@@ -340,14 +340,15 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
             # print('prats_case0')
             if prats_fastest_eq_number / prats_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
                 for i in range(nsteps):
-                    prats_nscf[i] = pscf[i] * max(meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / downscalinglimit)
+                    prats_nscf[i] = pscf[i] * max(prats_meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / downscalinglimit)
         else: # case(1)
-            # print('prats_case1')
-            if prats_fastest_eq_number > maxdesiredtimescale:
-                prats_nscf[prats_fastest_eq_index] = pscf[prats_fastest_eq_index] * max(meandesiredtimescale / prats_fastest_eq_number, 1.0 / downscalinglimit)
+            # print('prats_case1', prats_fastest_neq_number, prats_fastest_neq_index)
+            if prats_fastest_eq_number > prats_maxdesiredtimescale:
+                prats_nscf[prats_fastest_eq_index] = pscf[prats_fastest_eq_index] * max(prats_meandesiredtimescale / prats_fastest_eq_number, 1.0 / downscalinglimit)
             for i in range(nsteps):
-                if abs(prats_eq_fwd_ratio_list[i] - 0.5) < prats_reversibletol and max(step_fwd_number[i], step_rev_number[i]) < mindesiredtimescale:
-                    prats_nscf[i] = min(pscf[i] * max(meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / upscalinglimit), 1.0)
+                if abs(prats_eq_fwd_ratio_list[i] - 0.5) < prats_reversibletol and 0 < max(step_fwd_number[i], step_rev_number[i]) < prats_mindesiredtimescale:
+                    # print(max(step_fwd_number[i], step_rev_number[i]),i)
+                    prats_nscf[i] = min(pscf[i] * max(prats_meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / upscalinglimit), 1.0)
 
     # print(lega_nscf, prats_nscf)
     return lega_nscf, prats_nscf
