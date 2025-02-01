@@ -604,6 +604,7 @@ def copy_and_rename_files(input_file):
         "energetics_input.dat": "energetics_input.dat",
         "manually_downscaling_pt1.py": "manually_downscaling_pt1.py",
         "manually_downscaling_pt2.py": "manually_downscaling_pt2.py",
+        "downscaling_algorithm.dat": "downscaling_algorithm.dat",
     }
 
     # 拷贝并重命名文件
