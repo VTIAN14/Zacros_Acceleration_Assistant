@@ -299,7 +299,7 @@ def perform_stiffness_downscaling(maxallowedfastquasiequisepar, stiffnscalingthr
             prats_nscf[i] = min(1.0, upscalingfactor * pscf[i])
             stop_prats_scaling = True
     
-    # the following block is used for case 0 (no non-eq step)
+    # the following block is used for case 0 and 1
     
     if lega_fastest_neq_index == -1: # case(0)
         if lega_fastest_eq_number / lega_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
