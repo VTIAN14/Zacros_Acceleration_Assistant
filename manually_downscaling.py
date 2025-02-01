@@ -236,7 +236,7 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
     lega_fastest_neq_index = -1 # index of the fastest non equilibrium step
     lega_fastest_eq_number = 0 # max(max(ffwd, frev) for each step)
     lega_fastest_eq_index = -1 # index of the fastest eq step starts from 0
-    lega_lowest_eq_number = float('inf') # mmin(min(ffwd, frev) for each step)
+    lega_lowest_eq_number = float('inf') # min(min(ffwd, frev) for each step)
     lega_lowest_eq_index = -1 # index of the lowest eq step starts from 0
     
     for i in range(nsteps):
