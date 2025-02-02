@@ -328,22 +328,22 @@ def perform_stiffness_downscaling(input_file1, input_file2, input_file3):
         for i in range(nsteps):
             if (step_fwd_number[i] + step_rev_number[i] > 0) and abs(lega_eq_fwd_ratio_list[i] - 0.5) < lega_reversibletol:
                 if lega_mindesiredtimescale > min(step_fwd_number[i], step_rev_number[i]):
-                    # print(lega_mindesiredtimescale,min(step_fwd_number[i], step_rev_number[i]))
+                    # print(lega_mindesiredtimescale, min(step_fwd_number[i], step_rev_number[i]))
                     lega_nscf[i] = min(pscf[i] * lega_meandesiredtimescale / min(step_fwd_number[i], step_rev_number[i]), 1.0)
                     lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
                     # print(i, lega_nscf[i] * min(step_fwd_number[i], step_rev_number[i]))
                 if lega_maxdesiredtimescale < min(step_fwd_number[i], step_rev_number[i]):
-                    # print(lega_maxdesiredtimescale,min(step_fwd_number[i], step_rev_number[i]))
+                    # print(lega_maxdesiredtimescale, min(step_fwd_number[i], step_rev_number[i]))
                     lega_nscf[i] = pscf[i] * lega_meandesiredtimescale / min(step_fwd_number[i], step_rev_number[i])
                     lega_nscf[i] = lega_nscf[i] if lega_nscf[i] < stiffnscalingthreshold else 1.0
                     # print(i, lega_nscf[i] * min(step_fwd_number[i], step_rev_number[i]))
-                
+
     # print(stop_prats_scaling)
     if stop_prats_scaling == False:
         if prats_fastest_neq_index == -1: # case(0)
-            # print('prats_case0')
-            if prats_fastest_eq_number / prats_lowest_eq_number > maxallowedfastquasiequisepar: # case(0.0)
-                for i in range(nsteps):
+            # print('prats_case0', prats_lowest_eq_index, step_fwd_number[prats_lowest_eq_index], step_rev_number[prats_lowest_eq_index])
+            for i in range(nsteps):
+                if max(step_fwd_number[i], step_rev_number[i]) > prats_maxdesiredtimescale:
                     prats_nscf[i] = pscf[i] * max(prats_meandesiredtimescale / max(step_fwd_number[i], step_rev_number[i]), 1.0 / downscalinglimit)
         else: # case(1)
             # print('prats_case1', prats_fastest_neq_number, prats_fastest_neq_index)
