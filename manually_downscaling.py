@@ -382,7 +382,7 @@ def parse_history_file(input_file, output_file):
                     processed_adsorbates.add(adsorbate)
                     site_list.append(site)
 
-                    for other_line in lines[config_index + 1:]:
+                    for other_line in lines[config_index+1 : -1]:
                         other_parts = other_line.split()
                         if len(other_parts) < 4:
                             continue
