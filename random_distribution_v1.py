@@ -21,21 +21,8 @@ small_adj_matrix = np.array([
     [0, 1, 1, 1],
     [1, 0, 0, 1],
     [1, 0, 0, 0],
-    [1, 0, 1, 0]
+    [1, 1, 0, 0]
 ])
-
-# def generate_symmetric_adj_matrix(n, density=0.5):
-#     """ 生成 n 阶双向邻接矩阵（无向图），density 控制连通概率 """
-#     matrix = np.random.choice([0, 1], size=(n, n), p=[1-density, density])  # 随机 0/1 矩阵
-#     np.fill_diagonal(matrix, 0)  # 对角线设为 0（不允许自环）
-#     matrix = np.triu(matrix)  # 取上三角部分
-#     matrix += matrix.T  # 复制到下三角，确保对称
-#     return matrix
-
-# # 生成 5 阶双向邻接矩阵
-# n = 5
-# small_adj_matrix = generate_symmetric_adj_matrix(n)
-# print(small_adj_matrix)
 
 # 子图邻接矩阵
 # small_adj_matrix = np.array([
@@ -51,11 +38,9 @@ small_adj_matrix = np.array([
 #     [0 ,0, 1, 0]
 # ])
 
-# list_interaction = [0,0] #要求
 result = []
-# list_interaction_new = [0,0]
 
-def recursive_small(list_interaction, y): # 目的：找到small中所有的要求
+def recursive_small(list_interaction, y_traj, y): # 目的：找到small中所有的要求
     # print('strat',list_interaction)
     # if np.sum(small_adj_matrix) == 0:
     #     list_interaction = [0, 1] + [x + 1 for x in list_interaction]
@@ -65,6 +50,7 @@ def recursive_small(list_interaction, y): # 目的：找到small中所有的要�
         # print(i)
         if small_adj_matrix[y][i] == 1: # 找到大表中一个connection, 第一次一定成功
             if i not in list_interaction: # 第一次出现site i
+                y_traj.append(y)
                 list_interaction.append(y)
                 list_interaction.append(i)
                 small_adj_matrix[y][i] = 0
@@ -74,7 +60,7 @@ def recursive_small(list_interaction, y): # 目的：找到small中所有的要�
                     result_interaction = [0, 1] + [x + 1 for x in list_interaction]
                     return result_interaction
                 else:
-                    return recursive_small(list_interaction, i) # 换行搜索
+                    return recursive_small(list_interaction, y_traj, i) # 换行搜索
             else:  # 找到和原来某site 之间的关系（要求）了，只记录，继续在这行找
             # elif i != list_interaction[-2]: # 找到和原来某site 之间的关系（要求）了，只记录，继续在这行找
                 list_interaction.append(y)
@@ -88,12 +74,13 @@ def recursive_small(list_interaction, y): # 目的：找到small中所有的要�
     
     # 此时已查询过所有i，但没有一个符合要求，需要退回上一步
     # print('no match')
-    return recursive_small(list_interaction, list_interaction[-2])
-
-    # if list_interaction[-1] == y:
-    #     print('no match1')
+    y_new = y_traj[-1]
+    del y_traj[-1:] # 回到 y 的前一次
+    return recursive_small(list_interaction, y_traj, y_new)
+    # if list_interaction[-1] == y: # 找完了，且之前在这行没找到过东西
+    #     # print('no match1')
     #     return recursive_small(list_interaction, list_interaction[-2])
-    # else:
+    # else: # 找完了，但之前在这行找到过东西
     #     for i in reversed(range(len(list_interaction))):
     #         if i % 2 == 1 and list_interaction[i] == y:  # 只检查奇数索引
     #             return recursive_small(list_interaction, list_interaction[i-1])
@@ -160,7 +147,7 @@ def recursive_big(dont_search, dont_search2, pre, y, i): # 目的：遍历第 y 
         return recursive_big(dont_search, dont_search2, pre, 0, i-1)
     return recursive_big(dont_search, dont_search2, pre, pre[-1], i-1)
 
-result_interaction = recursive_small([],0)
+result_interaction = recursive_small([],[],0)
 print(result_interaction)
 
 dont_search = [[] for _ in range(len(result_interaction)//2)]
