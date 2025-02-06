@@ -8,6 +8,8 @@ import numpy as np
 #     [0, 0, 1, 1, 0]
 # ])
 
+site_type_big = [0,1,1,1,1,1]
+
 big_adj_matrix = np.array([
     [0, 1, 1, 1, 1, 1],
     [1, 0, 1, 1, 1, 1],
@@ -17,11 +19,18 @@ big_adj_matrix = np.array([
     [1, 1, 1, 1, 1, 0]
 ])
 
+site_type_small = [1,1]
+
 small_adj_matrix = np.array([
     [0, 1, 1, 1],
     [1, 0, 0, 1],
     [1, 0, 0, 0],
     [1, 1, 0, 0]
+])
+
+small_adj_matrix = np.array([
+    [0, 1],
+    [1, 0]
 ])
 
 # 子图邻接矩阵
@@ -93,8 +102,8 @@ def recursive_big(result, dont_search, dont_search2, pre, y, i): # 目的：遍�
             return recursive_big(result, dont_search, dont_search2, pre, pre[pre_index], i) # 去搜要求的搜索行
     # case = 0
     for j in range(big_adj_matrix.shape[0]):  # 逐个检测site j
-        if big_adj_matrix[y][j] == 1 and j not in dont_search2: # 找到大表中一个符合要求的connection
-            if (not dont_search[i-1]) or all([y,j] != sublist for sublist in dont_search[i-1]):
+        if big_adj_matrix[y][j] == 1 and site_type_big[j] == site_type_small[result_interaction[2*i-1]-1]: # 找到大表中一个符合要求的connection
+            if ((not dont_search[i-1]) or all([y,j] != sublist for sublist in dont_search[i-1])) and j not in dont_search2:
                 if result_interaction[2*i-1] in result_interaction[:2*i-2]: # "要求"不涉及新site
                     pre_index = pre[result_interaction.index(result_interaction[2*i-1])] 
                     if j == pre[pre_index]: # 找到的这个 j 必须符合"要求"中指定的那一个site, (对应搜索对[a,b]中第二个数 b)
