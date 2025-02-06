@@ -38,8 +38,6 @@ small_adj_matrix = np.array([
 #     [0 ,0, 1, 0]
 # ])
 
-result = []
-
 def recursive_small(list_interaction, y_traj, y): # 目的：找到small中所有的要求
     # print('strat',list_interaction)
     # if np.sum(small_adj_matrix) == 0:
@@ -85,14 +83,14 @@ def recursive_small(list_interaction, y_traj, y): # 目的：找到small中所�
     #         if i % 2 == 1 and list_interaction[i] == y:  # 只检查奇数索引
     #             return recursive_small(list_interaction, list_interaction[i-1])
 
-def recursive_big(dont_search, dont_search2, pre, y, i): # 目的：遍历第 y 行的第 j (1-L) 个 site 是否符合要求 i (从1开始)
+def recursive_big(result, dont_search, dont_search2, pre, y, i): # 目的：遍历第 y 行的第 j (1-L) 个 site 是否符合要求 i (从1开始)
     # print('start', dont_search, dont_search2, pre, y, i)
 
     if pre != []:
         pre_index = result_interaction.index(result_interaction[2*i-2])
         # print(i,pre_index, result_interaction)
         if y != pre[pre_index]: # 如果当前搜索行与要求中的搜索行不一致 (搜索行是搜索对[a,b]中第一个数 a)
-            return recursive_big(dont_search, dont_search2, pre, pre[pre_index], i) # 去搜要求的搜索行
+            return recursive_big(result, dont_search, dont_search2, pre, pre[pre_index], i) # 去搜要求的搜索行
     # case = 0
     for j in range(big_adj_matrix.shape[0]):  # 逐个检测site j
         if big_adj_matrix[y][j] == 1 and j not in dont_search2: # 找到大表中一个符合要求的connection
@@ -107,12 +105,12 @@ def recursive_big(dont_search, dont_search2, pre, y, i): # 目的：遍历第 y 
                             del pre[-2:]
                             dont_search2.append(j) # 重新搜索本行，但不要再搜到这个 j
                             #case = 1 
-                            return recursive_big(dont_search, dont_search2, pre, y, i)
+                            return recursive_big(result, dont_search, dont_search2, pre, y, i)
                         else: # 通过当前要求，但尚未通过所有要求，继续检测剩余要求
                             pre.append(y)
                             pre.append(j)
                             #case = 2
-                            return recursive_big(dont_search, dont_search2, pre, y, i+1) # 这里“要求”被符合，开始判断下一要求（迭代）,注意因为不涉及新site,这行没有搜完
+                            return recursive_big(result, dont_search, dont_search2, pre, y, i+1) # 这里“要求”被符合，开始判断下一要求（迭代）,注意因为不涉及新site,这行没有搜完
                 else: # “要求” 涉及新 site， 第一次一定在这个分支中
                     if j not in pre: # 新找到的 j 必须不能和原来找到的任何 big_site index 一致
                         if 2 * i == len(result_interaction): # 所有要求都检测完成
@@ -122,12 +120,12 @@ def recursive_big(dont_search, dont_search2, pre, y, i): # 目的：遍历第 y 
                             del pre[-2:]
                             dont_search2.append(j)
                             #case = 3
-                            return recursive_big(dont_search, dont_search2, pre, y, i)
+                            return recursive_big(result, dont_search, dont_search2, pre, y, i)
                         else: # 通过当前要求，但尚未通过所有要求，继续检测剩余要求
                             pre.append(y)
                             pre.append(j)
                             #case = 4
-                            return recursive_big(dont_search, dont_search2, pre, j, i+1) # 符合“要求” 才有继续查询是否满足其他要求的必要，这里要求被符合，进入迭代，搜下一行
+                            return recursive_big(result, dont_search, dont_search2, pre, j, i+1) # 符合“要求” 才有继续查询是否满足其他要求的必要，这里要求被符合，进入迭代，搜下一行
     
     # 此时已查询过所有j，但没有一个符合要求，需要退回上一步,继续搜索符合上一个要求的下一组yj
     # print('preif',i)
@@ -144,12 +142,12 @@ def recursive_big(dont_search, dont_search2, pre, y, i): # 目的：遍历第 y 
     dont_search2 = []
     del pre[-2:]
     if len(pre) == 0:
-        return recursive_big(dont_search, dont_search2, pre, 0, i-1)
-    return recursive_big(dont_search, dont_search2, pre, pre[-1], i-1)
+        return recursive_big(result, dont_search, dont_search2, pre, 0, i-1)
+    return recursive_big(result, dont_search, dont_search2, pre, pre[-1], i-1)
 
 result_interaction = recursive_small([],[],0)
 print(result_interaction)
 
 dont_search = [[] for _ in range(len(result_interaction)//2)]
-recursive_big(dont_search, [], [], 0, 1) # dont_search, dont_search2, pre, y, i
+result = recursive_big([],dont_search, [], [], 0, 1) # dont_search, dont_search2, pre, y, i
 print(result)
