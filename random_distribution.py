@@ -1,6 +1,7 @@
 import numpy as np
+import random
 
-# 70 % finished
+# 90% finished
 # input_file1 = "lattice_output.txt"
 # input_file2 = "state_input.dat"    
 
@@ -62,10 +63,12 @@ def parse_lattice_state(input_file1, input_file2):
     ads_site_type_all = []
     ads_matrix_all = []
     ads_name_passed_list = []
+    ads_number_list = []
     
     for i in range(len(ads_name)):
         if ads_name[i] not in ads_name_passed_list:
             ads_name_passed_list.append(ads_name[i])
+            ads_number_list.append(1)
             n = len(ads_site_all[i])  # 矩阵大小
             ads_matrix = np.zeros((n, n))  # 创建 n x n 矩阵
             ads_site_type = []
@@ -76,28 +79,45 @@ def parse_lattice_state(input_file1, input_file2):
                 ads_site_type.append(site_type_big[ads_site_all[i][j]-1])
             ads_matrix_all.append(ads_matrix)
             ads_site_type_all.append(ads_site_type)
+        else:
+            ads_number_list[ads_name_passed_list.index(ads_name[i])] += 1
         
     # print(ads_matrix_all,ads_name_passed_list,ads_site_type_all)
 
-    return big_adj_matrix, site_type_big, ads_matrix_all, ads_site_type_all, ads_name_passed_list
+    return big_adj_matrix, site_type_big, ads_matrix_all, ads_site_type_all, ads_name_passed_list, ads_number_list
 
-def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads_site_type_all, ads_name_passed_list):
+def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads_site_type_all, ads_name_passed_list, ads_number_list, output_file):
     
     # small_adj_matrix 从 ads_matrix_all 中提取
     # site_type_small 从 ads_site_type_all 中提取
     
-    for i in range(len(ads_name_passed_list)):
+    # for i in range(len(ads_name_passed_list)):
+    #     small_adj_matrix = ads_matrix_all[i]
+    #     result_interaction = recursive_small(small_adj_matrix, [], [], 0)
+    #     # print(result_interaction)
+    random_subgraph_all = []
+    for i in range(len(ads_name_passed_list)): # which adsorbate
         small_adj_matrix = ads_matrix_all[i]
         result_interaction = recursive_small(small_adj_matrix, [], [], 0)
-        # print(result_interaction)
-    
-    for i in range(len(ads_name_passed_list)):
-        site_type_small = ads_site_type_all[i]    
-        dont_search = [[] for _ in range(len(result_interaction)//2)]
-        result_subgraph = recursive_big(big_adj_matrix, site_type_big, result_interaction, site_type_small, [], dont_search, [], [], 0, 1) # dont_search, dont_search2, pre, y, i
+        site_type_small = ads_site_type_all[i]
+        
+        for j in range(ads_number_list[i]): # number of the adsorbates        
+            dont_search = [[] for _ in range(len(result_interaction)//2)]
+            # folliwng input vairables big_adj_matrix, site_type_big, result_interaction, site_type_small, dont_search, dont_search2, pre, y, i
+            result_subgraph = recursive_big(big_adj_matrix, site_type_big, result_interaction, site_type_small, [], dont_search, [], [], 0, 1) 
+            random_subgraph = random.choice(result_subgraph)
+            states_input_str = '  seed_on_sites ' + ads_name_passed_list[i] + ' ' + " ".join(map(str, result_subgraph))
+            random_subgraph_all.append(states_input_str)
+            for k in range(len(random_subgraph)):
+                site_type_big[random_subgraph[k]] == 0
+                
         # print(result_subgraph)
-    
-    return result_interaction, result_subgraph
+        
+    with open(output_file, "w") as out_f:
+        out_f.write("initial_state\n")
+        for i in range(len(states_input_str)):
+            out_f.write(states_input_str[i])
+        out_f.write("end_initial_state")
 
 def recursive_small(small_adj_matrix, list_interaction, y_traj, y): # 目的：找到small中所有的要求
 
