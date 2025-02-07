@@ -84,7 +84,7 @@ def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads
     
     # small_adj_matrix 从 ads_matrix_all 中提取
     # site_type_small 从 ads_site_type_all 中提取
-    # big_adj_matrix = big_adj_matrix[:500, :500] # for test
+    big_adj_matrix = big_adj_matrix[:500, :500] # for test
 
     random_subgraph_all = []
     for i in range(len(ads_name_passed_list)): # which adsorbate
@@ -95,10 +95,12 @@ def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads
         for j in range(ads_number_list[i]): # number of the adsorbates        
             dont_search = [[] for _ in range(len(result_interaction)//2)]
             # folliwng input vairables big_adj_matrix, site_type_big, result_interaction, site_type_small, dont_search, dont_search2, pre, y, i
-            result_subgraph = recursive_big(big_adj_matrix, site_type_big, result_interaction, site_type_small, [], dont_search, [], [], 0, 1) 
-            random_subgraph = random.choice(result_subgraph)
-            print(random_subgraph)
-            states_input_str = '  seed_on_sites ' + ads_name_passed_list[i] + ' ' + " ".join(map(str, random_subgraph)) + '\n'
+            result_subgraph = recursive_big(big_adj_matrix, site_type_big, result_interaction, site_type_small, [], dont_search, [], [], 0, 1)
+            if result_subgraph == []:
+                states_input_str = "No empty site for " + ads_name_passed_list[i] +'".'
+            else:
+                random_subgraph = random.choice(result_subgraph)
+                states_input_str = '  seed_on_sites ' + ads_name_passed_list[i] + ' ' + " ".join(map(str, random_subgraph)) + '\n'
             random_subgraph_all.append(states_input_str)
             for k in range(len(random_subgraph)):
                 site_type_big[random_subgraph[k]] == 0
@@ -141,7 +143,11 @@ def recursive_small(small_adj_matrix, list_interaction, y_traj, y): # 目的：�
     
     # 此时已查询过所有i，但没有一个符合要求，需要退回上一步
     # print('no match')
-    y_new = y_traj[-1]
+    if y_traj != []: # monodentate
+        y_new = y_traj[-1]
+    else:
+        result_interaction = [0,1]
+        return result_interaction
     del y_traj[-1:] # 回到 y 的前一次
     return recursive_small(small_adj_matrix, list_interaction, y_traj, y_new)
 
@@ -178,7 +184,10 @@ def recursive_big(big_adj_matrix, site_type_big, result_interaction, site_type_s
                         if 2 * i == len(result_interaction): # 所有要求都检测完成
                             pre.append(y)
                             pre.append(j)
-                            result_subgraph.append(pre[2:].copy())
+                            if pre[2:] != []:
+                                result_subgraph.append(pre[2:]) # 记录该映射
+                            else: # monodentate
+                                result_subgraph.append([j])
                             del pre[-2:]
                             dont_search2.append(j)
                             #case = 3
