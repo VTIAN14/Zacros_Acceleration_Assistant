@@ -1,7 +1,6 @@
 import numpy as np
 import random
 
-# 90% finished
 # input_file1 = "lattice_output.txt"
 # input_file2 = "state_input.dat"    
 
