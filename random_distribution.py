@@ -9,11 +9,11 @@ def parse_lattice_state(input_file1, input_file2):
     
     numbers = []  # 用于存储数列
     with open(input_file1, "r") as file: # lattice_output.txt
-        lines = file.readlines()[2:]  # 从第3行开始读取（索引 2 开始）
+        lines = file.readlines()[2:] # 从第3行开始读取（索引 2 开始）
     
         for line in lines:
             # 将每行的数字提取出来，转换为整数或浮点数
-            row_numbers = [float(num) for num in line.split()]  # 假设数据是空格分隔
+            row_numbers = [float(num) for num in line.split()] # 假设数据是空格分隔
             numbers.append(row_numbers)
     
     n = len(numbers)  # 矩阵大小
@@ -38,27 +38,22 @@ def parse_lattice_state(input_file1, input_file2):
     ads_site_all = [] # 存储第三列及其后面的所有数据
     
     with open(input_file2, "r") as file: # state_input.dat
-        lines = file.readlines()[1:-1]  # **跳过第一行和最后一行**
+        # lines = file.readlines()[1:-1]  # **跳过第一行和最后一行**
+        lines = file.readlines()
+        for line in lines:
+            line = line.strip()  # **去除首尾空格**
+            
+            if not line or line.startswith("#") or line.startswith("initial_state") or line.startswith("end_initial_state"):
+                continue  
     
         for line in lines:
-            values = line.split()  # **按空格分割（假设数据是空格分隔）**
+            values = line.split('#')[0].split()  # **按空格分割（假设数据是空格分隔）**
             
             if len(values) >= 3:  # 确保至少有 3 列
                 ads_name.append(values[1])  # **存入第二列数据**
                 ads_site = list(map(int, values[2:]))  # **存入第三列及之后的所有数据**
                 ads_site_all.append(ads_site)
-    
-    # print("第二列数据：", ads_name)
-    
-    # count_ads_name_dict = {}
-    
-    # for item in ads_name:
-    #     count_ads_name_dict[item] = count_ads_name_dict.get(item, 0) + 1  # 遇到相同元素 +1
-    
-    # print(count_ads_name_dict)
-    
-    # print("第三列及之后的数列：", ads_site_all)
-    
+       
     ads_site_type = []
     ads_site_type_all = []
     ads_matrix_all = []
@@ -90,23 +85,21 @@ def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads
     
     # small_adj_matrix 从 ads_matrix_all 中提取
     # site_type_small 从 ads_site_type_all 中提取
-    
-    # for i in range(len(ads_name_passed_list)):
-    #     small_adj_matrix = ads_matrix_all[i]
-    #     result_interaction = recursive_small(small_adj_matrix, [], [], 0)
-    #     # print(result_interaction)
+    # big_adj_matrix = big_adj_matrix[:500, :500] # for test
+
     random_subgraph_all = []
     for i in range(len(ads_name_passed_list)): # which adsorbate
         small_adj_matrix = ads_matrix_all[i]
         result_interaction = recursive_small(small_adj_matrix, [], [], 0)
         site_type_small = ads_site_type_all[i]
-        
+
         for j in range(ads_number_list[i]): # number of the adsorbates        
             dont_search = [[] for _ in range(len(result_interaction)//2)]
             # folliwng input vairables big_adj_matrix, site_type_big, result_interaction, site_type_small, dont_search, dont_search2, pre, y, i
             result_subgraph = recursive_big(big_adj_matrix, site_type_big, result_interaction, site_type_small, [], dont_search, [], [], 0, 1) 
             random_subgraph = random.choice(result_subgraph)
-            states_input_str = '  seed_on_sites ' + ads_name_passed_list[i] + ' ' + " ".join(map(str, result_subgraph))
+            print(random_subgraph)
+            states_input_str = '  seed_on_sites ' + ads_name_passed_list[i] + ' ' + " ".join(map(str, random_subgraph)) + '\n'
             random_subgraph_all.append(states_input_str)
             for k in range(len(random_subgraph)):
                 site_type_big[random_subgraph[k]] == 0
