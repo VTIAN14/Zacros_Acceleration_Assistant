@@ -372,7 +372,7 @@ def parse_history_file(input_file, output_file):
 
     with open(output_file, "w") as out_f:
         out_f.write("initial_state\n")
-        for line in lines[config_index + 1:]:
+        for line in lines[config_index+1 : -1]:
             parts = line.split()
 
             site, adsorbate, ads_type, ads_dentate = int(parts[0]), int(parts[1]), int(parts[2]), int(parts[3])
@@ -382,7 +382,7 @@ def parse_history_file(input_file, output_file):
                     processed_adsorbates.add(adsorbate)
                     site_list.append(site)
 
-                    for other_line in lines[config_index+1 : -1]:
+                    for other_line in lines[config_index + 1:]:
                         other_parts = other_line.split()
                         if len(other_parts) < 4:
                             continue
@@ -399,7 +399,7 @@ def parse_history_file(input_file, output_file):
                     sites_str = " ".join(map(str, site_list))
                     out_f.write(f"  seed_on_sites {surface_species_name} {sites_str}\n")
                     site_list = []
-        out_f.write("end_initial_state\n")
+        out_f.write("end_initial_state")
 
 def plot_bar_chart(input_file1, input_file2, output_file):
     
@@ -467,10 +467,10 @@ def generate_nscf_file(input_file1, input_file2, lega_nscf, prats_nscf, output_f
         for line in f:
             if line.strip().startswith("max_steps"):
                 parts = line.split()
-                maxsteps = int(parts[1])
+                maxsteps = parts[1]
             if line.strip().startswith("max_time"):
                 parts = line.split()
-                maxtime = float(parts[1])
+                maxtime = parts[1]
 
     # 遍历文件提取数据
     with open(input_file2, "r") as f:
@@ -505,11 +505,11 @@ def generate_nscf_file(input_file1, input_file2, lega_nscf, prats_nscf, output_f
     with open(output_file, "w") as f:
         for step, value1, value2, value3 in zip(steps, pscf, lega_nscf, prats_nscf):
             if step == 'max_steps':
-                f.write(f"{step:<26} {int(value1):<12} {int(value1)}\n")
+                f.write(f"{step:<26} {value1:<12} {value1}\n")
                 f.write("\n")
                 f.write('Step                       Factor       Legacy       Prats2024\n')
             elif step == 'max_time':
-                f.write(f"{step:<26} {float(value1):<12} {float(value1)}\n")
+                f.write(f"{step:<26} {value1:<12} {value1}\n")
             else:
                 f.write(f"{step:<26} {value1:.2e}     {value2:.2e}     {value3:.2e}     {'1.00e-0'}\n")
 
