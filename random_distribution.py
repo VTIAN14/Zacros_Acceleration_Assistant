@@ -115,8 +115,8 @@ def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads
         
     with open(output_file, "w") as out_f:
         out_f.write("initial_state\n")
-        for i in range(len(states_input_str)):
-            out_f.write(states_input_str[i])
+        for i in range(len(random_subgraph_all)):
+            out_f.write(random_subgraph_all[i])
         out_f.write("end_initial_state")
 
 def recursive_small(small_adj_matrix, list_interaction, y_traj, y): # 目的：找到small中所有的要求
