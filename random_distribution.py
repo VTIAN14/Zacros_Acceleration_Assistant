@@ -1,5 +1,6 @@
 import numpy as np
 
+# 70 % finished
 # input_file1 = "lattice_output.txt"
 # input_file2 = "state_input.dat"    
 
