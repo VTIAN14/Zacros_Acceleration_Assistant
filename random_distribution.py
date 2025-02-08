@@ -85,7 +85,7 @@ def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads
     # small_adj_matrix 从 ads_matrix_all 中提取
     # site_type_small 从 ads_site_type_all 中提取
     big_adj_matrix = big_adj_matrix[:500, :500] # for test
-
+    ads_info = []  # will be used in the future
     random_subgraph_all = []
     for i in range(len(ads_name_passed_list)): # which adsorbate
         small_adj_matrix = ads_matrix_all[i]
@@ -101,9 +101,10 @@ def perform_graph_isomorphism(big_adj_matrix, site_type_big, ads_matrix_all, ads
             else:
                 random_subgraph = random.choice(result_subgraph)
                 states_input_str = '  seed_on_sites ' + ads_name_passed_list[i] + ' ' + " ".join(map(str, random_subgraph)) + '\n'
+                ads_info.append([ads_name_passed_list[i]] + random_subgraph)
             random_subgraph_all.append(states_input_str)
             for k in range(len(random_subgraph)):
-                site_type_big[random_subgraph[k]] == 0
+                site_type_big[random_subgraph[k]] == -1
                 
         # print(result_subgraph)
         
