@@ -1,0 +1,71 @@
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QComboBox, QMenuBar, QMenu, QAction
+from PyQt5.QtGui import QPixmap
+from ui_reaction_analysis import ReactionAnalysisApp
+
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Zacros-manually-down-0.1V")
+        self.setGeometry(100, 100, 400, 400)
+        
+        # **创建主布局**
+        main_layout = QVBoxLayout()
+                
+        # **创建菜单栏**
+        self.menu_bar = QMenuBar(self)
+        
+        # **创建 File 菜单**
+        file_menu = self.menu_bar.addMenu("File")
+        open_action = QAction("Open", self)  # 创建一个 "Open" 选项
+        open_action.triggered.connect(self.openFileDialog)
+        file_menu.addAction(open_action)
+        
+        exit_action = QAction("Exit", self)  # 创建一个 "Exit" 选项
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+        
+
+        # **创建 Plot 菜单**
+        plot_menu = self.menu_bar.addMenu("Plot")
+        plot_action = QAction("Show Plot", self)
+        plot_action.triggered.connect(self.openSecondWindow)
+        plot_menu.addAction(plot_action)
+
+        # **创建 Help 菜单**
+        help_menu = self.menu_bar.addMenu("Help")
+        about_action = QAction("About", self)
+        about_action.triggered.connect(self.show_about_info)
+        help_menu.addAction(about_action)
+        label = QLabel(self)
+        pixmap = QPixmap("MA.jpg")
+        label.setPixmap(pixmap)
+        main_layout.addWidget(label)
+        self.label = QLabel("", self)
+        main_layout.addWidget(self.label)
+        # **添加菜单栏到布局**
+        main_layout.setMenuBar(self.menu_bar)
+        
+
+        
+        self.setLayout(main_layout)
+
+    def openFileDialog(self):
+        folder_path = QFileDialog.getExistingDirectory(self, "选择文件夹")
+        if folder_path:
+            self.selected_folder = folder_path
+            self.label.setText(f"已选择: {folder_path}")
+
+    def show_about_info(self):
+        """显示 About 信息"""
+        self.label.setText("Zacros Acceleration Assistant v1.0\nCreated by Weitian and Yuhong")
+        
+    def openSecondWindow(self):
+        if self.selected_folder:
+            self.second_window = ReactionAnalysisApp(self.selected_folder)
+            self.second_window.show()
+        else:
+            self.label.setText("请先选择一个文件夹！")
