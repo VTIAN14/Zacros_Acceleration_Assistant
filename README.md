@@ -12,6 +12,7 @@ Zacros_Acceleration_Assistant
 
 Update Log – April 1, 2025
 ——————————————————————————————————————
+
 Added TPD Plot Functionality:
 
 Introduced support for Temperature Programmed Desorption (TPD) plotting.
