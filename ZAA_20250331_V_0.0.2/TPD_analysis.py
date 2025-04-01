@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog,
     QComboBox, QLineEdit, QListView, QMessageBox,
-    QSpinBox, QHBoxLayout
+    QSpinBox, QHBoxLayout, QMenu, QMenuBar
 )
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtCore import Qt
@@ -15,28 +15,58 @@ from matplotlib.figure import Figure
 class TPD_core(QWidget):
     def __init__(self, input_path):
         super().__init__()
-        
-        self.thickness_spin = QSpinBox()
-        self.thickness_spin.setRange(1, 10)
-        self.thickness_spin.setValue(2)
-        
-        self.interval_input = QSpinBox()
-        self.interval_input.setRange(1, 100)
-        self.interval_input.setValue(30)
-        
-        self.export_button = QPushButton("Export TPD Data")
-        self.export_button.clicked.connect(self.exportData)
-        
+        self.setWindowTitle("TPD_Plotting")
+        self.resize(800, 600)
+
+        self.input_paths = [input_path]
+        self.all_species_data = {}
+        self.selected_folder = input_path
+        self.input_file1 = f"{self.selected_folder}/specnum_output.txt"
         self.index_to_value = {}
         self.species = []
         self.selected = []
         self.items = []
-        self.selected_folder = input_path
-        self.setWindowTitle("TPD_plotting")
+
+        # 画布
         self.canvas = MatplotlibCanvas(self, width=8, height=6, dpi=100)
-        self.input_file1 = f"{self.selected_folder}/specnum_output.txt"
-        
-        # 控件布局
+
+        # 温度间隔、线宽
+        self.thickness_spin = QSpinBox()
+        self.thickness_spin.setRange(1, 10)
+        self.thickness_spin.setValue(2)
+
+        self.interval_input = QSpinBox()
+        self.interval_input.setRange(1, 100)
+        self.interval_input.setValue(30)
+
+        # 导出按钮
+        self.export_button = QPushButton("Export TPD Data")
+        self.export_button.clicked.connect(self.exportData)
+
+        # 文件菜单
+        menubar = QMenuBar(self)
+        file_menu = QMenu("File", self)
+        add_dir_action = file_menu.addAction("Add More Directory")
+        add_dir_action.triggered.connect(self.add_more_directory)
+        menubar.addMenu(file_menu)
+
+        # 主 layout（只用一个）
+        self.layout = QVBoxLayout(self)
+        self.layout.setMenuBar(menubar)
+
+        # 初始化 species 和 combo
+        self.initUI()
+        self.layout.addWidget(self.combo)
+
+        # Plot 按钮
+        self.save_button = QPushButton("Save the species selected and plot the TPD")
+        self.save_button.clicked.connect(self.saveSelection)
+        self.layout.addWidget(self.save_button)
+
+        # Plot 图表区域
+        self.layout.addWidget(self.canvas)
+
+        # 参数设置区域
         hlayout = QHBoxLayout()
         hlayout.addWidget(QLabel("Line Thickness:"))
         hlayout.addWidget(self.thickness_spin)
@@ -44,15 +74,9 @@ class TPD_core(QWidget):
         hlayout.addWidget(self.interval_input)
         hlayout.addWidget(self.export_button)
 
-        self.initUI()
+        self.layout.addLayout(hlayout)
+
         
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.combo)
-        self.save_button = QPushButton("Save the species selected and plot the TPD")
-        layout.addWidget(self.canvas)
-        self.save_button.clicked.connect(self.saveSelection)
-        layout.addWidget(self.save_button)
-        layout.addLayout(hlayout)
 
     def initUI(self):
         self.setWindowTitle("TPD_Plotting")
@@ -71,6 +95,27 @@ class TPD_core(QWidget):
         selected = self.combo.getCheckedItems()
         self.selected = selected
         self.plot_TPD()
+        
+    def add_more_directory(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Another Input Folder")
+        if folder:
+            input_file = f"{folder}/specnum_output.txt"
+            try:
+                with open(input_file, 'r') as file:
+                    first_line = file.readline().strip()
+            except FileNotFoundError:
+                QMessageBox.warning(self, "Error", f"'specnum_output.txt' not found in {folder}")
+                return
+    
+            species = first_line.split()
+            species = [s for s in species if s not in ['Entry', 'Nevents', 'Time', 'Temperature', 'Energy']]
+            self.input_paths.append(folder)
+            self.all_species_data[folder] = species
+    
+            # 更新 comboBox 项
+            new_items = [f"{folder.split('/')[-1]}::{s}" for s in species]
+            self.combo.addItems(new_items)
+            self.index_to_value.update({item: i for i, item in enumerate(species)})
 
     def plot_TPD(self):
         if not self.selected:
@@ -90,17 +135,33 @@ class TPD_core(QWidget):
         temperature_list_final = []
 
         for species in key_value:
-            index = self.index_to_value[species]
+            # 获取对应文件夹和原始 species 名称
+            if "::" in species:
+                folder_name, pure_species = species.split("::")
+                matched_path = next((p for p in self.input_paths if p.endswith(folder_name)), None)
+            else:
+                matched_path = self.selected_folder
+                pure_species = species
+        
+            if matched_path is None:
+                continue
+        
+            input_file = f"{matched_path}/specnum_output.txt"
+        
+            index = self.index_to_value.get(pure_species, -1)
+            if index == -1:
+                continue
+        
             index_list = [index + 1]
-
+        
             temperature_list, all_TPD_list, TPD_lists = modifing_zacros.Generate_TPD_List_from_Row(
-                specnum_result,
+                parsing_zacros.Parsing_Specnum(input_file)[7],  # specnum_result
                 ideal_temperature_interval,
-                temperature_interval,
-                temperature,
+                parsing_zacros.Parsing_Specnum(input_file)[3],  # temperature_interval
+                parsing_zacros.Parsing_Specnum(input_file)[4],  # temperature
                 index_list
             )
-
+        
             for idx, TPD_curve in enumerate(TPD_lists):
                 label = f"{species}" if len(TPD_lists) == 1 else f"{species}_{idx + 1}"
                 self.canvas.axes.plot(
@@ -109,19 +170,20 @@ class TPD_core(QWidget):
                     label=label,
                     linewidth=line_thickness
                 )
-
+        
                 if TPD_curve:
                     max_y = max(TPD_curve)
                     max_x = temperature_list[TPD_curve.index(max_y)]
-                    self.canvas.axes.text(max_x, max_y, f"{max_x:.0f}", ha='center', va='bottom', fontsize=9)
-
+                    self.canvas.axes.text(max_x, max_y, f"{max_x:.0f}", ha='center', va='bottom', fontsize=16)
+        
                 all_TPD_data.append(TPD_curve)
                 temperature_list_final = temperature_list
 
-        self.canvas.axes.set_title("TPD Plot")
-        self.canvas.axes.set_xlabel("Temperature (K)")
-        self.canvas.axes.set_ylabel("TPD Signal (1/K)")
-        self.canvas.axes.legend(fontsize=9)
+
+        self.canvas.axes.set_title("TPD Plot", fontsize=20)
+        self.canvas.axes.set_xlabel("Temperature (K)", fontsize=20)
+        self.canvas.axes.set_ylabel("TPD Signal (1/K)", fontsize=20)
+        self.canvas.axes.legend(fontsize=15)
         self.canvas.draw()
 
         # 自动保存为图片
@@ -172,6 +234,12 @@ class CheckableComboBox(QComboBox):
 
         self.setView(QListView())
         self.model.dataChanged.connect(self.updateText)
+    def addItems(self, items):
+        for text in items:
+            item = QStandardItem(text)
+            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+            item.setData(Qt.Unchecked, Qt.CheckStateRole)
+            self.model.appendRow(item)
 
     def updateText(self):
         selected_items = []
