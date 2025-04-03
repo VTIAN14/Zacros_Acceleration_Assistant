@@ -73,10 +73,16 @@ class TPD_core(QWidget):
         hlayout.addWidget(QLabel("Temp Interval:"))
         hlayout.addWidget(self.interval_input)
         hlayout.addWidget(self.export_button)
-
+        self.toggle_view_btn = QPushButton("Toggle View Mode")
+        self.toggle_view_btn.clicked.connect(self.toggleViewMode)
+        hlayout.addWidget(self.toggle_view_btn)
+        
+        self.multi_view = False  # 初始为单图模式
         self.layout.addLayout(hlayout)
 
-        
+    def toggleViewMode(self):
+        self.multi_view = not self.multi_view
+        self.plot_TPD()     
 
     def initUI(self):
         self.setWindowTitle("TPD_Plotting")
@@ -121,19 +127,25 @@ class TPD_core(QWidget):
         if not self.selected:
             QMessageBox.information(self, "Fatal Error", "At least you should pick one species")
             return
-
+    
         key_value = self.selected
         ideal_temperature_interval = self.interval_input.value()
         line_thickness = self.thickness_spin.value()
-
+    
         linecache.clearcache()
-        self.canvas.axes.clear()
-
-        tot_steps, events, time, temperature_interval, temperature, energy, adsorbate, specnum_result = parsing_zacros.Parsing_Specnum(self.input_file1)
-
-        all_TPD_data = []
-        temperature_list_final = []
-
+    
+        # 清除整个图
+        self.canvas.figure.clf()
+    
+        if self.multi_view:
+            axes_list = []
+        else:
+            ax = self.canvas.figure.add_subplot(111)
+            ax.clear()
+    
+        all_curve_data = []
+        all_labels = []
+    
         for species in key_value:
             # 获取对应文件夹和原始 species 名称
             if "::" in species:
@@ -142,18 +154,18 @@ class TPD_core(QWidget):
             else:
                 matched_path = self.selected_folder
                 pure_species = species
-        
+    
             if matched_path is None:
                 continue
-        
+    
             input_file = f"{matched_path}/specnum_output.txt"
-        
+    
             index = self.index_to_value.get(pure_species, -1)
             if index == -1:
                 continue
-        
+    
             index_list = [index + 1]
-        
+    
             temperature_list, all_TPD_list, TPD_lists = modifing_zacros.Generate_TPD_List_from_Row(
                 parsing_zacros.Parsing_Specnum(input_file)[7],  # specnum_result
                 ideal_temperature_interval,
@@ -161,58 +173,77 @@ class TPD_core(QWidget):
                 parsing_zacros.Parsing_Specnum(input_file)[4],  # temperature
                 index_list
             )
-        
+    
             for idx, TPD_curve in enumerate(TPD_lists):
                 label = f"{species}" if len(TPD_lists) == 1 else f"{species}_{idx + 1}"
-                self.canvas.axes.plot(
-                    temperature_list,
-                    TPD_curve,
-                    label=label,
-                    linewidth=line_thickness
-                )
-        
+                all_labels.append(label)
+    
+                if self.multi_view:
+                    ax = self.canvas.figure.add_subplot(len(key_value), 1, len(all_curve_data)+1,
+                                                        sharex=axes_list[0] if axes_list else None)
+                    axes_list.append(ax)
+                else:
+                    ax = self.canvas.figure.axes[0]
+    
+                ax.plot(temperature_list, TPD_curve, label=label, linewidth=line_thickness)
+    
                 if TPD_curve:
                     max_y = max(TPD_curve)
                     max_x = temperature_list[TPD_curve.index(max_y)]
-                    self.canvas.axes.text(max_x, max_y, f"{max_x:.0f}", ha='center', va='bottom', fontsize=16)
-        
-                all_TPD_data.append(TPD_curve)
-                temperature_list_final = temperature_list
-
-
-        self.canvas.axes.set_title("TPD Plot", fontsize=20)
-        self.canvas.axes.set_xlabel("Temperature (K)", fontsize=20)
-        self.canvas.axes.set_ylabel("TPD Signal (1/K)", fontsize=20)
-        self.canvas.axes.legend(fontsize=15)
+                    ax.text(max_x, max_y, f"{max_x:.0f}", ha='center', va='bottom', fontsize=10)
+    
+                if self.multi_view:
+                    ax.set_ylabel("TPD", fontsize=10)
+                    ax.legend(fontsize=8)
+                else:
+                    ax.set_xlabel("Temperature (K)", fontsize=20)
+                    ax.set_ylabel("TPD Signal (1/K)", fontsize=20)
+    
+                all_curve_data.append((temperature_list, TPD_curve))
+    
+        # 设置标题与图例（仅 overlay 模式下）
+        if not self.multi_view:
+            ax.set_title("TPD Plot", fontsize=20)
+            ax.legend(fontsize=15)
+    
+        # 自动调整子图间距
+        self.canvas.figure.tight_layout()
+    
+        # 更新绘图
         self.canvas.draw()
-
+    
         # 自动保存为图片
         self.canvas.figure.savefig("TPD_Figure.png")
-
-        # 保存数据到类变量
-        self.latest_temperature_list = temperature_list_final
-        self.latest_TPD_data = all_TPD_data
-        self.latest_labels = self.canvas.axes.get_legend_handles_labels()[1]
-
+    
+        # 保存数据
+        self.latest_TPD_curves = all_curve_data
+        self.latest_labels = all_labels
+    
         linecache.clearcache()
 
+
     def exportData(self):
-        if not hasattr(self, 'latest_TPD_data'):
+        if not hasattr(self, 'latest_TPD_curves'):
             QMessageBox.warning(self, "Error", "No data to export. Please plot first.")
             return
-
+    
         file_path, _ = QFileDialog.getSaveFileName(self, "Save TPD Data", "", "Text Files (*.txt);;All Files (*)")
         if not file_path:
             return
-
-        with open(file_path, "w") as ff:
-            ff.write("Temp" + "".join([f"{label:>20}" for label in self.latest_labels]) + "\n")
-            for i in range(len(self.latest_temperature_list)):
-                row = f"{round(self.latest_temperature_list[i], 3):<10}"
-                for j in range(len(self.latest_TPD_data)):
-                    row += f"{round(self.latest_TPD_data[j][i], 3):>20}"
-                ff.write(row + "\n")
-        QMessageBox.information(self, "Success", "TPD data exported successfully.")
+    
+        try:
+            with open(file_path, "w") as ff:
+                ff.write("# Exported TPD Data (each species has its own temperature and signal columns)\n\n")
+                for idx, (temps, signals) in enumerate(self.latest_TPD_curves):
+                    label = self.latest_labels[idx] if idx < len(self.latest_labels) else f"Species_{idx+1}"
+                    ff.write(f"# {label}\n")
+                    ff.write(f"{'Temperature':>15} {'TPD Signal':>15}\n")
+                    for t, s in zip(temps, signals):
+                        ff.write(f"{round(t, 3):>15} {round(s, 6):>15}\n")
+                    ff.write("\n")
+            QMessageBox.information(self, "Success", "TPD data exported successfully.")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to export TPD data:\n{e}")
 
 
 class CheckableComboBox(QComboBox):
