@@ -6,9 +6,8 @@
 
 
 
-### Update Log – April 01, 2025
-#### TPD plot function improved:
-Now you can compared the result from different directory.
+
+
 
 
 ### Update Log – March 31, 2025
@@ -17,6 +16,7 @@ Now you can compared the result from different directory.
 Introduced support for Temperature Programmed Desorption (TPD) plotting.
 Now supports plotting multiple species simultaneously.
 Users can export the resulting plots for further analysis or publication.
+Now you can compared the result from different directory
 
 ### Update Log – February 20, 2025
 #### Added Manual Downscaling Feature:
