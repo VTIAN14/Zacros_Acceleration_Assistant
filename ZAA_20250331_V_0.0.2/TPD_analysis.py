@@ -232,18 +232,30 @@ class TPD_core(QWidget):
             return
     
         try:
+            # 保证所有物种的温度列一致
+            reference_temps = self.latest_TPD_curves[0][0]  # 取第一个物种的温度列表作为标准
+    
             with open(file_path, "w") as ff:
-                ff.write("# Exported TPD Data (each species has its own temperature and signal columns)\n\n")
-                for idx, (temps, signals) in enumerate(self.latest_TPD_curves):
-                    label = self.latest_labels[idx] if idx < len(self.latest_labels) else f"Species_{idx+1}"
-                    ff.write(f"# {label}\n")
-                    ff.write(f"{'Temperature':>15} {'TPD Signal':>15}\n")
-                    for t, s in zip(temps, signals):
-                        ff.write(f"{round(t, 3):>15} {round(s, 6):>15}\n")
-                    ff.write("\n")
+                # 写表头
+                header = "{:>15}".format("Temperature")
+                for label in self.latest_labels:
+                    header += "{:>20}".format(label)
+                ff.write(header + "\n")
+    
+                # 写数据行
+                for i in range(len(reference_temps)):
+                    line = "{:>15.3f}".format(reference_temps[i])
+                    for _, signals in self.latest_TPD_curves:
+                        if i < len(signals):
+                            line += "{:>20.6f}".format(signals[i])
+                        else:
+                            line += "{:>20}".format("")  # 如果信号数据较短，用空格填充
+                    ff.write(line + "\n")
+    
             QMessageBox.information(self, "Success", "TPD data exported successfully.")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to export TPD data:\n{e}")
+
 
 
 class CheckableComboBox(QComboBox):
