@@ -16,9 +16,13 @@ The species chasing Function can help user analysis the species evolution of a s
 #### Added TPD Plot Functionality:
 
 Introduced support for Temperature Programmed Desorption (TPD) plotting.
+
 following update
+
 1: Now supports plotting multiple species simultaneously. (April 02)
+
 2: Users can export the resulting plots for further analysis or publication. (April 03)
+
 3:Now you can compared the result from different directory (April 05)
 
 ### Update Log – February 20, 2025
