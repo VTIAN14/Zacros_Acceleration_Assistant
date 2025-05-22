@@ -11,6 +11,7 @@
 #### Added Species Chasing Functionality:
 The species chasing Function can help user analysis the species evolution of a specific interval.
 
+Now the species chasing Function can set the different interval(or temperature) May 22
 
 ### Update Log – March 31, 2025
 #### Added TPD Plot Functionality:
