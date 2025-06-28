@@ -19,33 +19,30 @@ from PyQt5.QtWidgets import QDialog
 
 class SpeciesEvolutionChaseWindow(QWidget):
     """主窗口"""
-
     def __init__(self, folder_path: str | None = None):
         super().__init__()
         if folder_path is None:
             folder_path = self.ask_folder()
             if not folder_path:
                 sys.exit(0)
-
         self.folder_path = folder_path
         self.species_actions: dict[str, QAction] = {}
         self.tmp_dir = Path(tempfile.mkdtemp(prefix="sp_net_"))
         self.initUI()
-
     # ---------------- UI ----------------------------------------------------
     def initUI(self):
-        self.setWindowTitle("Species Evolution + Network Viewer")
+        self.setWindowTitle("Species Evolution")
         self.resize(800, 700)
         layout = QVBoxLayout(self)
 
         # 文件夹信息
-        self.folder_label = QLabel(f"已选择文件夹: {self.folder_path}")
+        self.folder_label = QLabel(f"Selected_folder: {self.folder_path}")
         self.folder_label.setWordWrap(True)
         layout.addWidget(self.folder_label)
 
         # 物种多选下拉
-        layout.addWidget(QLabel("请选择要分析的物种（可多选）:"))
-        self.species_button = QToolButton(text="选择物种 ▼",
+        layout.addWidget(QLabel("Plz choose the species you wanna analysis:"))
+        self.species_button = QToolButton(text="Select the species ▼",
                                           popupMode=QToolButton.InstantPopup)
         self.species_menu = QMenu(self)
         self.species_button.setMenu(self.species_menu)
@@ -55,7 +52,7 @@ class SpeciesEvolutionChaseWindow(QWidget):
 
         # INI / FIN
         cfg = QHBoxLayout()
-        for lab, spin in [("INI 配置编号:", "ini_spin"), ("FIN 配置编号:", "fin_spin")]:
+        for lab, spin in [("INI temperature:", "ini_spin"), ("FIN temperature:", "fin_spin")]:
             cfg.addWidget(QLabel(lab))
             sb = QSpinBox()
             sb.setRange(0, 9999)
@@ -64,12 +61,12 @@ class SpeciesEvolutionChaseWindow(QWidget):
         layout.addLayout(cfg)
 
         # 布尔选项
-        self.chk_ignore_diff = QCheckBox("忽略扩散 (ignore_diffusion)", checked=True)
-        self.chk_overwrite_map = QCheckBox("覆盖 transformations.json", checked=True)
-        self.chk_overwrite_sum = QCheckBox("覆盖 summary*.txt", checked=True)
+        self.chk_ignore_diff = QCheckBox("(ignore_diffusion)", checked=True)
+        self.chk_overwrite_map = QCheckBox("reconstruct transformations.json(keep open except test mode)", checked=True)
+        self.chk_overwrite_sum = QCheckBox("cover the summary*.txt(keep open except test mode)", checked=True)
         
         # ➜ 新增：是否仅保留与该物种直接相关的边
-        self.chk_filter_edges = QCheckBox("仅显示与该物种直接相关的边", checked=True)
+        self.chk_filter_edges = QCheckBox("Only the main product or not(like CH3->CH2 ignore the H)", checked=True)
         
         layout.addWidget(self.chk_ignore_diff)
         layout.addWidget(self.chk_overwrite_map)
@@ -77,7 +74,7 @@ class SpeciesEvolutionChaseWindow(QWidget):
         layout.addWidget(self.chk_filter_edges)         
 
         # 运行按钮
-        self.run_button = QPushButton("开始分析")
+        self.run_button = QPushButton("analysis")
         self.run_button.clicked.connect(self.run_analysis)
         layout.addWidget(self.run_button)
 
@@ -106,9 +103,9 @@ class SpeciesEvolutionChaseWindow(QWidget):
         self.height_input.setSingleStep(1.0)
         self.height_input.setDecimals(1)
         self.height_input.setValue(5.0)
-        size_layout.addWidget(QLabel("图像宽度（英寸）:"))
+        size_layout.addWidget(QLabel("width of the graph:"))
         size_layout.addWidget(self.width_input)
-        size_layout.addWidget(QLabel("图像高度（英寸）:"))
+        size_layout.addWidget(QLabel("highet of the graph:"))
         size_layout.addWidget(self.height_input)
         layout.addLayout(size_layout)
 
@@ -117,7 +114,7 @@ class SpeciesEvolutionChaseWindow(QWidget):
     def populate_species(self):
         gen_path = Path(self.folder_path) / "general_output.txt"
         if not gen_path.exists():
-            self.species_menu.addAction("未找到 general_output.txt").setEnabled(False)
+            self.species_menu.addAction("Sorry the general_output.txt can not be founded").setEnabled(False)
             return
 
         pat = re.compile(r'^\s*\d+\.\s+\S+_(fwd|rev):.*?Reaction:\s+(.+?)\s*->\s*(.+)$')
@@ -145,7 +142,7 @@ class SpeciesEvolutionChaseWindow(QWidget):
         self.height_input.clearFocus()
         sel_species = [s for s, a in self.species_actions.items() if a.isChecked()]
         if not sel_species:
-            self.output_area.setText("请至少选择一个物种。")
+            self.output_area.setText("plz select one species at least :( ")
             self.image_label.clear()
             return
 
@@ -190,7 +187,7 @@ class SpeciesEvolutionChaseWindow(QWidget):
 )
 
             except Exception as e:
-                txt_out.append(f"❌ {sp} 分析失败:\n{e}")
+                txt_out.append(f"❌ {sp} error plz contact Yuhong or wetian:\n{e}")
 
         self.output_area.setText("\n\n".join(txt_out))
 
@@ -242,7 +239,7 @@ class SpeciesEvolutionChaseWindow(QWidget):
 class ImagePopup(QDialog):
     def __init__(self, image_path, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Reaction Network 图像预览")
+        self.setWindowTitle("Reaction Network")
         self.resize(800, 600)
 
         layout = QVBoxLayout(self)
