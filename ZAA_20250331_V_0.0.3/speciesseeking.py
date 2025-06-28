@@ -10,68 +10,28 @@ def extract_core_formula(species_name):
 def compute_overlap(comp1, comp2):
     return sum(min(comp1[e], comp2[e]) for e in comp1.keys() & comp2.keys())
 
-def parse_procstat_output(file_path,ini_config=None, fin_config=None):
+def parse_procstat_output(file_path, ini_config=None, fin_config=None):
     with open(file_path, 'r') as f:
         lines = f.readlines()
     reactions = re.split(r'\s+', lines[0].strip())
     reactions = [r for r in reactions if r.lower() != 'overall']
-    
-    #Collect the configuration lines.
-    config_data = {}
-    for i in range(len(lines)):
-       if lines[i].startswith("configuration"):
-           parts = lines[i].split()
-           if len(parts) >= 2 and parts[1].isdigit():
-               cfg_num = int(parts[1])
-               int_counts_line = lines[i + 2].strip()
-               counts = [int(c) for c in re.split(r'\s+', int_counts_line)]
-               config_data[cfg_num] = counts
-    
-    if ini_config is None or fin_config is None:
-        print('hello')
-        with open(file_path, 'r') as f:
-            lines = f.readlines()
-        reactions = re.split(r'\s+', lines[0].strip())
-        reactions = [r for r in reactions if r.lower() != 'overall']
-        counts = [int(c) for c in re.split(r'\s+', lines[-1].strip())[1:]]
-        stats = []
-        for i in range(0, len(reactions), 2):
-            fwd, rev = reactions[i], reactions[i+1]
-            fwd_c, rev_c = counts[i], counts[i+1]
-            net = fwd_c - rev_c
-            stats.append({
-                "reaction_name": fwd[:-4],
-                "fwd_count": fwd_c,
-                "rev_count": rev_c,
-                "net_count": net
-            })
-        return stats
-
-    if ini_config not in config_data or fin_config not in config_data:
-        raise ValueError(f"INI ({ini_config}) 或 FIN ({fin_config}) 配置未在文件中找到")
-
-    ini_counts = config_data[ini_config]
-    fin_counts = config_data[fin_config]
-    print('ini_counts')
-    print(ini_counts)
+    counts = [int(c) for c in re.split(r'\s+', lines[-1].strip())[1:]]
     stats = []
     for i in range(0, len(reactions), 2):
-        rxn_name = reactions[i][:-4]
-        ini_fwd, ini_rev = ini_counts[i], ini_counts[i + 1]
-        fin_fwd, fin_rev = fin_counts[i], fin_counts[i + 1]
-    
-        delta_fwd = fin_fwd - ini_fwd
-        delta_rev = fin_rev - ini_rev
-        delta_net = delta_fwd - delta_rev  
-    
+        fwd, rev = reactions[i], reactions[i+1]
+        fwd_c, rev_c = counts[i], counts[i+1]
+        net = fwd_c - rev_c
+        idx = i // 2  # index 从 0 开始计数
+        if ini_config is not None and idx < ini_config:
+            continue
+        if fin_config is not None and idx > fin_config:
+            continue
         stats.append({
-            "reaction_name": rxn_name,
-            "fwd_count": delta_fwd,
-            "rev_count": delta_rev,
-            "net_count": delta_net
+            "reaction_name": fwd[:-4],
+            "fwd_count": fwd_c,
+            "rev_count": rev_c,
+            "net_count": net
         })
-
-
     return stats
 
 def parse_general_output(file_path):
@@ -305,15 +265,149 @@ def summarize_species_flow(species_key, merged_data, transformations,
         "transformed_to": to_map
     }
 
+# 绘图: 从 transformations dict 生成网络 PNG + GraphML
+import math
+import networkx as nx
+import matplotlib.pyplot as plt
+
+def draw_reaction_network(transformations: dict,
+                          outfile_prefix: str = "reaction_network",
+                          highlight_species: str | None = None,
+                          skip_self_loops: bool = True,
+                          use_graphviz: bool = True,
+                          summary_filter: dict | None = None,
+                          fig_width: float | None = None,
+                          fig_height: float | None = None):
+    """
+    根据 transformations = {"forward": {...}, "reverse": {...}}
+    画全量正/逆反应网络图，并导出：
+        outfile_prefix + ".png"
+        outfile_prefix + ".graphml"
+    如果 highlight_species 给定，则把该节点染成橙色并加粗描边。
+    可自定义 fig_width, fig_height（单位：英寸）
+    """
+    import math
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    fwd, rev = transformations["forward"], transformations["reverse"]
+    G = nx.DiGraph(name="Reaction Network (auto-generated)")
+
+    allowed_edges = set()
+    if summary_filter and highlight_species:
+        srcs = set(summary_filter["generated_from"].keys())
+        tgts = set(summary_filter["transformed_to"].keys())
+        for r in srcs:
+            allowed_edges.add((r, highlight_species))
+        for t in tgts:
+            allowed_edges.add((highlight_species, t))
+
+    for rxn, mapping in fwd.items():
+        for reactant, products in mapping.items():
+            for p in products:
+                if skip_self_loops and reactant == p:
+                    continue
+                if summary_filter and (reactant, p) not in allowed_edges:
+                    continue
+                G.add_edge(reactant, p, reaction=rxn, direction="fwd")
+
+    for rxn, mapping in rev.items():
+        for product, reactants in mapping.items():
+            for r in reactants:
+                if skip_self_loops and r == product:
+                    continue
+                if summary_filter and (product, r) not in allowed_edges:
+                    continue
+                G.add_edge(product, r, reaction=rxn, direction="rev")
+
+    if G.number_of_nodes() == 0:
+        print("[Warn] network is empty, skip drawing.")
+        return
+
+    try:
+        if use_graphviz:
+            if G.number_of_nodes() <= 10:
+                pos = nx.nx_agraph.graphviz_layout(G, prog="neato")
+            else:
+                pos = nx.nx_agraph.graphviz_layout(G, prog="sfdp")
+        else:
+            k_val = 0.4 if G.number_of_nodes() <= 10 else 1.2 / math.sqrt(max(G.number_of_nodes(), 1))
+            pos = nx.spring_layout(G, seed=42, k=k_val, iterations=300)
+    except Exception as e:
+        print("⚠  Graphviz layout unavailable, fallback spring:", e)
+        k_val = 0.4 if G.number_of_nodes() <= 10 else 1.2 / math.sqrt(max(G.number_of_nodes(), 1))
+        pos = nx.spring_layout(G, seed=42, k=k_val, iterations=300)
+
+    NODE_SIZE = 2000
+    EDGE_WIDTH = 5
+    ARROW_SIZE = 9
+    FONT_SIZE = 7
+
+    edge_cols = ["#E24A33AA" if d["direction"] == "fwd" else "#348ABD88"
+                 for _, _, d in G.edges(data=True)]
+
+    node_cols = []
+    node_edges = []
+    for n in G.nodes():
+        if highlight_species and n == highlight_species:
+            node_cols.append("#FFA34E")
+            node_edges.append("#CC5500")
+        else:
+            node_cols.append("#A6D854")
+            node_edges.append("#555555")
+
+    # 自定义或自动推算画布大小
+    fig_w = fig_width or max(14, G.number_of_nodes() * 0.14)
+    fig_h = fig_height or (0.75 * fig_w)
+
+    plt.figure(figsize=(fig_w, fig_h), dpi=300)
+
+    nx.draw_networkx_nodes(
+        G, pos,
+        node_size=NODE_SIZE,
+        node_color=node_cols,
+        edgecolors=node_edges,
+        linewidths=1.4
+    )
+    nx.draw_networkx_edges(
+        G, pos,
+        arrows=True,
+        edge_color=edge_cols,
+        width=EDGE_WIDTH,
+        arrowsize=ARROW_SIZE,
+        arrowstyle="-|>",
+        connectionstyle="arc3,rad=0.07"
+    )
+    nx.draw_networkx_labels(
+        G, pos,
+        font_size=FONT_SIZE,
+        font_color="#000000"
+    )
+
+    plt.title(f"Reaction Network (highlight: {highlight_species})"
+              if highlight_species else "Reaction Network",
+              fontsize=12, pad=12)
+
+    plt.axis("off")
+    plt.tight_layout()
+    plt.savefig(outfile_prefix + ".png", bbox_inches="tight")
+    nx.write_graphml(G, outfile_prefix + ".graphml")
+
+
+
+
+
+
 def main(directory, species_key,
          ignore_diffusion=False,
-         mapping_path='transformations.txt',
+         mapping_path='transformations.json',
          overwrite_mapping=True,
-         overwrite_summary=False,ini_config=None,
+         overwrite_summary=True,
+         ini_config=None,
          fin_config=None):
     procfile = os.path.join(directory, 'procstat_output.txt')
     genfile = os.path.join(directory, 'general_output.txt')
-    procstat_data = parse_procstat_output(procfile,ini_config,fin_config)
+    procstat_data = parse_procstat_output(procfile, ini_config=ini_config, fin_config=fin_config)
     general_data = parse_general_output(genfile)
     merged_data = merge_reaction_data(procstat_data, general_data)
     species_comp = element_analysis_with_pymatgen(merged_data)
@@ -331,16 +425,14 @@ if __name__ == "__main__":
 #    directory = input("请输入包含 procstat_output.txt 和 general_output.txt 的文件夹路径： ")
 #    species_key = input("请输入要分析的物种名称（如 CH3*_Cu(hollowCu)）： ")
     directory =  r"C:\Users\qq126\Documents\Vinita_KMC_results\test"
-    species_key = "CH3O*_Cu(hollowCu)"
+    species_key = "CH3*_Cu(hollowCu)"
     result = main(
         directory, species_key,
         ignore_diffusion=True,
-        mapping_path='transformations.txt',
+        mapping_path='transformations.json',
         overwrite_mapping=True,  # 强制重新生成映射
-        overwrite_summary=False,ini_config=None,
-        fin_config=None
+        overwrite_summary=True
     )
-    print(result)
     print("\n--- Summary ---")
     print(f"Generated by (+{sum(e['count'] for e in result['producers'])}):")
     for e in result['producers']:
@@ -354,3 +446,17 @@ if __name__ == "__main__":
     print("product:")
     for p, c in result['transformed_to'].items():
         print(f"  {p:50s} -{c}")
+    
+    
+    
+    
+    with open('transformations.json', 'r', encoding='utf-8') as f:
+        transformations = json.load(f)
+    draw_reaction_network(
+        transformations,
+        outfile_prefix="reaction_network_full",
+        highlight_species=species_key,         # 高亮目标物种
+        skip_self_loops=True,                  # 忽略自环
+        use_graphviz=True,                      # 若已装 pygraphviz
+        summary_filter=result
+    )
