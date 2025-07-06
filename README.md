@@ -34,3 +34,8 @@ Implemented a manually adjustable downscaling function.
 
 Users can now control the downscaling rate via a sliding bar for more precise tuning.
 
+
+If you have any questions about ZAA: 
+
+yuhong.luo@reuben.ox.ac.uk
+weitian.li@lmh.ox.ac.uk
