@@ -11,7 +11,8 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 from parse_lattice_block import parse_lattice_block
-
+from PyQt5.QtWidgets import QInputDialog
+from PyQt5.QtWidgets import QSizePolicy
 # 配置项
 INPUT_FILE = r"C:\Users\qq126\Documents\lattice_input.dat"
 BOX = 20.0
@@ -39,11 +40,23 @@ class LatticeCanvas(FigureCanvas):
         super().__init__(fig)
         self.df = df
         self.pattern_panel = pattern_panel  # <—— 显式保存引用
-        self.ax = fig.add_subplot(111)
+        self.ax = fig.add_axes([0, 0, 1, 1])  # 不留边距地填满整个 Figure
         self.setParent(parent)
+        self.dot_size = 800
+        self.line_width = 0.7
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.plot()
         self.mpl_connect("pick_event", self.on_pick)
 
+
+    def set_dot_size(self, size):
+        self.dot_size = size
+        self.plot()
+        
+    def set_line_width(self, width):
+        self.line_width = width
+        self.plot()
+        
     def plot(self):
         self.ax.clear()
         self.G, self.pos, self.cell, self.origin = build_graph(self.df)
@@ -59,7 +72,7 @@ class LatticeCanvas(FigureCanvas):
         for n in self.window_mask:
             xy = self.pos[n]
             st = self.G.nodes[n]["site"]
-            self.ax.scatter(*xy, color=color[st], s=60, edgecolors="k", picker=True, zorder=3)
+            self.ax.scatter(*xy, color=color[st], s=self.dot_size, edgecolors="k", picker=True, zorder=3)
             self.ax.text(*xy, str(n), fontsize=6, ha='center', va='center', zorder=4)
 
         for u, v in self.G.edges():
@@ -72,11 +85,12 @@ class LatticeCanvas(FigureCanvas):
                 d = raw_d.copy()
                 d -= self.cell * np.round(d / self.cell)
                 style = '--' if np.any(np.abs(d - raw_d) > 1e-6) else '-'
-                self.ax.plot([p[0], p[0] + d[0]], [p[1], p[1] + d[1]], style, color='k', lw=0.7)
+                self.ax.plot([p[0], p[0] + d[0]], [p[1], p[1] + d[1]], style, color='k', lw=self.line_width)
 
         self.ax.set_aspect("equal")
         self.ax.set_title("Lattice Viewer")
         self.ax.set_xlabel("x"); self.ax.set_ylabel("y")
+        self.figure.tight_layout()
         self.draw()
 
     def on_pick(self, event):
@@ -134,13 +148,44 @@ class PatternDesignWindow(QMainWindow):
         self.pattern_panel = PatternPanel()  # <—— 提前构建 PatternPanel
         self.canvas = LatticeCanvas(df, pattern_panel=self.pattern_panel, parent=self)  # <—— 传给 canvas
 
+        main_widget = QWidget()
+        layout = QHBoxLayout(main_widget)
+        
         splitter = QSplitter()
         splitter.addWidget(self.canvas)
         splitter.addWidget(self.pattern_panel)
-        splitter.setSizes([800, 400])
+        splitter.setStretchFactor(0, 3)  # 左边 LatticeCanvas 权重更大
+        splitter.setStretchFactor(1, 1)  # 右边 PatternPanel 权重较小
         layout.addWidget(splitter)
-
         self.setCentralWidget(main_widget)
+        
+        self.init_menu()
+    def init_menu(self):
+        menubar = self.menuBar()
+        view_menu = menubar.addMenu("View")
+    
+        # 设置球大小
+        dot_action = view_menu.addAction("Set Ball Size...")
+        dot_action.triggered.connect(self.set_dot_size_dialog)
+    
+        # 设置线宽
+        line_action = view_menu.addAction("Set Line Width...")
+        line_action.triggered.connect(self.set_line_width_dialog)
+    
+    def set_dot_size_dialog(self):
+        size, ok = QInputDialog.getInt(
+        self, "Set Ball Size", "Enter ball (dot) size:", value=self.canvas.dot_size, min=1, max=30000
+    )
+        if ok:
+            self.canvas.set_dot_size(size)
+    
+    def set_line_width_dialog(self):
+        width, ok = QInputDialog.getDouble(
+            self, "Set Line Width", "Enter line width:", value=self.canvas.line_width, min=0.1, max=10.0, decimals=2
+        )
+        if ok:
+            self.canvas.set_line_width(width)
+            
 
 
 if __name__ == "__main__":
