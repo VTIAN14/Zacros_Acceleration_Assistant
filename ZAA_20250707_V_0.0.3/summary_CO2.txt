@@ -1,0 +1,9 @@
+Species: CO2
+
+Generated (total +99):
+  CO2--*                                             +99
+By reactant contributions:
+  CO2*_Cu(topCu)                                     +99
+
+Consumed (total -0):
+By product contributions:

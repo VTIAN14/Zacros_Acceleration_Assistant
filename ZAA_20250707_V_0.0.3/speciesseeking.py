@@ -325,14 +325,15 @@ def draw_reaction_network(transformations: dict,
         return
 
     try:
-        if use_graphviz:
-            if G.number_of_nodes() <= 10:
-                pos = nx.nx_agraph.graphviz_layout(G, prog="neato")
-            else:
-                pos = nx.nx_agraph.graphviz_layout(G, prog="sfdp")
+        if use_graphviz and G.number_of_nodes() > 4:
+            try:
+                layout_prog = "sfdp" if G.number_of_nodes() > 10 else "neato"
+                pos = nx.nx_agraph.graphviz_layout(G, prog=layout_prog)
+            except Exception:
+                pos = nx.spring_layout(G, seed=42,k=1.8)
         else:
-            k_val = 0.4 if G.number_of_nodes() <= 10 else 1.2 / math.sqrt(max(G.number_of_nodes(), 1))
-            pos = nx.spring_layout(G, seed=42, k=k_val, iterations=300)
+            pos = nx.spring_layout(G, seed=42,k=1.8)
+
     except Exception as e:
         print("⚠  Graphviz layout unavailable, fallback spring:", e)
         k_val = 0.4 if G.number_of_nodes() <= 10 else 1.2 / math.sqrt(max(G.number_of_nodes(), 1))

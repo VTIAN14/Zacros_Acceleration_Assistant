@@ -1,0 +1,25 @@
+Species: H*_Cu(hollowCu)
+
+Generated (total +300):
+  CHO*_Cu->CO*_Cu+H*_Cu                              +1
+  CH3O*_Cu->CH2O*_Cu+H*_Cu                           +100
+  CH2O*_Cu->CHO*_Cu+H*_Cu                            +1
+  HCOO*_Cu->CO2*_Cu+H*                               +54
+  HCOO*_Cu->CO2*_Cu+H*                               +45
+  H2COO*_Cu->HCOO*_Cu+H*                             +1
+  H2COO*_Cu->HCOO*_Cu+H*                             +98
+By reactant contributions:
+  CHO*_Cu(topCu,topCu)                               +1
+  CH3O*_Cu(hollowCu)                                 +100
+  CH2O*_Cu(hollowCu)                                 +1
+  HCOO*_Cu(topCu,topCu)                              +99
+  H2COO*_Cu(topCu,topCu)                             +99
+
+Consumed (total -272):
+  H+H                                                -28
+  O+H--OH                                            -242
+  OH+H--H2O                                          -2
+By product contributions:
+  H2                                                 -28
+  OH*_Cu(hollowCu)                                   -242
+  H2O*_Cu(topCu)                                     -2

@@ -1,0 +1,626 @@
+{
+  "forward": {
+    "CH4->CH3*_Cu+H*_Cu_120_degree": {
+      "CH4_Cu": [
+        "CH3*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH4->CH3*_Cu+H*_Cu_180_degree": {
+      "CH4_Cu": [
+        "CH3*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH3*_Cu->CH2*_Cu+H*_Cu": {
+      "CH3*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu->CH*_Cu+H*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_Cu->C*_Cu+H*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "C*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH4+O*_Cu->CH3*_Cu+OH*_Cu_2": {
+      "CH4_Cu": [
+        "CH3*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH3*_Cu+O*_Cu->CH2*_Cu+OH*_Cu": {
+      "CH3*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu+O*_Cu->CH*_Cu+OH*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_Cu+O*_Cu->C*_Cu+OH*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "C*_Cu(hollowCu)",
+        "OH*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH4+OH*_Cu->CH3*_Cu+H20*_Cu_2": {
+      "CH4_Cu": [
+        "CH3*_Cu(hollowCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "CH3*_Cu+OH*_Cu->CH2*_Cu+H2O*_Cu": {
+      "CH3*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "CH2*_Cu+OH*_Cu->CH*_Cu+H2O*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)",
+        "H2O*_Cu(topCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "CH*_Cu+OH*_Cu->C*_Cu+H2O*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "C*_Cu(hollowCu)",
+        "H2O*_Cu(topCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "O+H--OH": {
+      "O*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "OH+H--H2O": {
+      "OH*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "H2O--*": {
+      "H2O": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "H*_diff_Cu": {
+      "H*_Cu(hollowCu)": [
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH3*_diff_Cu": {
+      "CH3*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_diff_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_diff_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ]
+    },
+    "C*_diff_Cu": {
+      "C*_Cu(hollowCu)": [
+        "C*_Cu(hollowCu)"
+      ]
+    },
+    "O*_diff_Cu": {
+      "O*_Cu(hollowCu)": [
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "OH*_diff_Cu": {
+      "OH*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "H2O*_diff_Cu": {
+      "H2O*_Cu(topCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "OH*_Cu+OH*_Cu->O*_Cu+H2O*_Cu": {
+      "OH*_Cu(hollowCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "C*_Cu+O*_Cu->CO*_Cu": {
+      "C*_Cu(hollowCu)": [
+        "CO*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "CO*_Cu(hollowCu)"
+      ]
+    },
+    "CO*_Cu+O*_Cu->CO2*_Cu+*": {
+      "CO*_Cu(hollowCu)": [
+        "CO2*_Cu(topCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "CO2*_Cu(topCu)"
+      ]
+    },
+    "CH*_Cu+O*_Cu->CHO*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CHO*_Cu->CO*_Cu+H*_Cu": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CO*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CO-diff": {
+      "CO*_Cu(hollowCu)": [
+        "CO*_Cu(hollowCu)"
+      ]
+    },
+    "CHO_diff": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CHO_diff_2": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CO2_diff": {
+      "CO2*_Cu(topCu)": [
+        "CO2*_Cu(topCu)"
+      ]
+    },
+    "CO--*": {
+      "CO": [
+        "CO*_Cu(hollowCu)"
+      ]
+    },
+    "CO2--*": {
+      "CO2": [
+        "CO2*_Cu(topCu)"
+      ]
+    },
+    "CH3*_Cu+O*_Cu->CH3O*_Cu": {
+      "CH3*_Cu(hollowCu)": [
+        "CH3O*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "CH3O*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu+O*_Cu->CH2O*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH2O*_Cu(hollowCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "CH2O*_Cu(hollowCu)"
+      ]
+    },
+    "CH3O*_Cu->CH2O*_Cu+H*_Cu": {
+      "CH3O*_Cu(hollowCu)": [
+        "CH2O*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH2O*_Cu->CHO*_Cu+H*_Cu": {
+      "CH2O*_Cu(hollowCu)": [
+        "CHO*_Cu(topCu,topCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CHO*_Cu+O*_Cu->HCOO*_Cu": {
+      "CHO*_Cu(topCu,topCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ]
+    },
+    "HCOO*_Cu->CO2*_Cu+H*": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "CO2*_Cu(topCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH3O-diff": {
+      "CH3O*_Cu(hollowCu)": [
+        "CH3O*_Cu(hollowCu)"
+      ]
+    },
+    "CH2O-diff": {
+      "CH2O*_Cu(hollowCu)": [
+        "CH2O*_Cu(hollowCu)"
+      ]
+    },
+    "HCOO_diff": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ]
+    },
+    "HCOO_diff_2": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ]
+    },
+    "H2COO_diff": {
+      "H2COO*_Cu(topCu,topCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ]
+    },
+    "H2COO_diff_2": {
+      "H2COO*_Cu(topCu,topCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CH2O*_Cu+O*_Cu->H2COO*_Cu": {
+      "CH2O*_Cu(hollowCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ],
+      "O*_Cu(hollowCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ]
+    },
+    "H2COO*_Cu->HCOO*_Cu+H*": {
+      "H2COO*_Cu(topCu,topCu)": [
+        "HCOO*_Cu(topCu,topCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    }
+  },
+  "reverse": {
+    "CH4->CH3*_Cu+H*_Cu_120_degree": {
+      "CH3*_Cu(hollowCu)": [
+        "CH4_Cu"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH4_Cu"
+      ]
+    },
+    "CH4->CH3*_Cu+H*_Cu_180_degree": {
+      "CH3*_Cu(hollowCu)": [
+        "CH4_Cu"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH4_Cu"
+      ]
+    },
+    "CH3*_Cu->CH2*_Cu+H*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu->CH*_Cu+H*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_Cu->C*_Cu+H*_Cu": {
+      "C*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)"
+      ]
+    },
+    "CH4+O*_Cu->CH3*_Cu+OH*_Cu_2": {
+      "CH3*_Cu(hollowCu)": [
+        "CH4_Cu"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH3*_Cu+O*_Cu->CH2*_Cu+OH*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu+O*_Cu->CH*_Cu+OH*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_Cu+O*_Cu->C*_Cu+OH*_Cu": {
+      "C*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)"
+      ],
+      "OH*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH4+OH*_Cu->CH3*_Cu+H20*_Cu_2": {
+      "CH3*_Cu(hollowCu)": [
+        "CH4_Cu"
+      ],
+      "H2O*_Cu(topCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH3*_Cu+OH*_Cu->CH2*_Cu+H2O*_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)"
+      ],
+      "H2O*_Cu(topCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu+OH*_Cu->CH*_Cu+H2O*_Cu": {
+      "CH*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ],
+      "H2O*_Cu(topCu)": [
+        "CH2*_Cu(hollowCu)",
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_Cu+OH*_Cu->C*_Cu+H2O*_Cu": {
+      "C*_Cu(hollowCu)": [
+        "CH*_Cu(hollowCu)"
+      ],
+      "H2O*_Cu(topCu)": [
+        "CH*_Cu(hollowCu)",
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "O+H--OH": {
+      "OH*_Cu(hollowCu)": [
+        "O*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "OH+H--H2O": {
+      "H2O*_Cu(topCu)": [
+        "OH*_Cu(hollowCu)",
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "H2O--*": {
+      "H2O*_Cu(topCu)": [
+        "H2O"
+      ]
+    },
+    "H*_diff_Cu": {
+      "H*_Cu(hollowCu)": [
+        "H*_Cu(hollowCu)"
+      ]
+    },
+    "CH3*_diff_Cu": {
+      "CH3*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_diff_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_diff_Cu": {
+      "CH2*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)"
+      ]
+    },
+    "C*_diff_Cu": {
+      "C*_Cu(hollowCu)": [
+        "C*_Cu(hollowCu)"
+      ]
+    },
+    "O*_diff_Cu": {
+      "O*_Cu(hollowCu)": [
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "OH*_diff_Cu": {
+      "OH*_Cu(hollowCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "H2O*_diff_Cu": {
+      "H2O*_Cu(topCu)": [
+        "H2O*_Cu(topCu)"
+      ]
+    },
+    "OH*_Cu+OH*_Cu->O*_Cu+H2O*_Cu": {
+      "H2O*_Cu(topCu)": [
+        "OH*_Cu(hollowCu)"
+      ]
+    },
+    "C*_Cu+O*_Cu->CO*_Cu": {
+      "CO*_Cu(hollowCu)": [
+        "C*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CO*_Cu+O*_Cu->CO2*_Cu+*": {
+      "CO2*_Cu(topCu)": [
+        "CO*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH*_Cu+O*_Cu->CHO*_Cu": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CH*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CHO*_Cu->CO*_Cu+H*_Cu": {
+      "CO*_Cu(hollowCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CO-diff": {
+      "CO*_Cu(hollowCu)": [
+        "CO*_Cu(hollowCu)"
+      ]
+    },
+    "CHO_diff": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CHO_diff_2": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CHO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CO2_diff": {
+      "CO2*_Cu(topCu)": [
+        "CO2*_Cu(topCu)"
+      ]
+    },
+    "CO--*": {
+      "CO*_Cu(hollowCu)": [
+        "CO"
+      ]
+    },
+    "CO2--*": {
+      "CO2*_Cu(topCu)": [
+        "CO2"
+      ]
+    },
+    "CH3*_Cu+O*_Cu->CH3O*_Cu": {
+      "CH3O*_Cu(hollowCu)": [
+        "CH3*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH2*_Cu+O*_Cu->CH2O*_Cu": {
+      "CH2O*_Cu(hollowCu)": [
+        "CH2*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "CH3O*_Cu->CH2O*_Cu+H*_Cu": {
+      "CH2O*_Cu(hollowCu)": [
+        "CH3O*_Cu(hollowCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH3O*_Cu(hollowCu)"
+      ]
+    },
+    "CH2O*_Cu->CHO*_Cu+H*_Cu": {
+      "CHO*_Cu(topCu,topCu)": [
+        "CH2O*_Cu(hollowCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "CH2O*_Cu(hollowCu)"
+      ]
+    },
+    "CHO*_Cu+O*_Cu->HCOO*_Cu": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "CHO*_Cu(topCu,topCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "HCOO*_Cu->CO2*_Cu+H*": {
+      "CO2*_Cu(topCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CH3O-diff": {
+      "CH3O*_Cu(hollowCu)": [
+        "CH3O*_Cu(hollowCu)"
+      ]
+    },
+    "CH2O-diff": {
+      "CH2O*_Cu(hollowCu)": [
+        "CH2O*_Cu(hollowCu)"
+      ]
+    },
+    "HCOO_diff": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ]
+    },
+    "HCOO_diff_2": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "HCOO*_Cu(topCu,topCu)"
+      ]
+    },
+    "H2COO_diff": {
+      "H2COO*_Cu(topCu,topCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ]
+    },
+    "H2COO_diff_2": {
+      "H2COO*_Cu(topCu,topCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ]
+    },
+    "CH2O*_Cu+O*_Cu->H2COO*_Cu": {
+      "H2COO*_Cu(topCu,topCu)": [
+        "CH2O*_Cu(hollowCu)",
+        "O*_Cu(hollowCu)"
+      ]
+    },
+    "H2COO*_Cu->HCOO*_Cu+H*": {
+      "HCOO*_Cu(topCu,topCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ],
+      "H*_Cu(hollowCu)": [
+        "H2COO*_Cu(topCu,topCu)"
+      ]
+    }
+  }
+}

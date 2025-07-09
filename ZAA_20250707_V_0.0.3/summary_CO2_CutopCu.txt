@@ -1,0 +1,12 @@
+Species: CO2*_Cu(topCu)
+
+Generated (total +99):
+  HCOO*_Cu->CO2*_Cu+H*                               +54
+  HCOO*_Cu->CO2*_Cu+H*                               +45
+By reactant contributions:
+  HCOO*_Cu(topCu,topCu)                              +99
+
+Consumed (total -99):
+  CO2--*                                             -99
+By product contributions:
+  CO2                                                -99
