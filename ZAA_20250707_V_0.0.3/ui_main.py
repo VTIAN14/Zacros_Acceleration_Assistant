@@ -70,35 +70,39 @@ class MainWindow(QWidget):
         self.setLayout(main_layout)
 
     def openFileDialog(self):
-        folder_path = QFileDialog.getExistingDirectory(self, "选择文件夹")
+        folder_path = QFileDialog.getExistingDirectory(self, "choose a folder")
         if folder_path:
             self.selected_folder = folder_path
-            self.label.setText(f"已选择: {folder_path}")
+            self.label.setText(f"have selected: {folder_path}")
 
     def show_about_info(self):
         """显示 About 信息"""
         self.label.setText("Zacros Acceleration Assistant v1.0\nCreated by Weitian and Yuhong")
     def openPatternDesigner(self):
-        from pattern_design import PatternDesignWindow  # 确保你另一个文件名是 pattern_design.py
-        self.pattern_window = PatternDesignWindow()
-        self.pattern_window.show()    
+        if hasattr(self, 'selected_folder'):
+            from pattern_design import PatternDesignWindow
+            self.pattern_window = PatternDesignWindow(self.selected_folder)
+            self.pattern_window.show()
+        else:
+            self.label.setText("chose one folder first plz")
+
     def openSecondWindow(self):
         if self.selected_folder:
             self.second_window = ReactionAnalysisApp(self.selected_folder)
             self.second_window.show()
         else:
-            self.label.setText("请先选择一个文件夹！")
+            self.label.setText("chose one folder first plz")
    
     def openSpeciesEvolutionWindow(self):
         if hasattr(self, 'selected_folder'):
             self.evolution_window = SpeciesEvolutionChaseWindow(self.selected_folder)
             self.evolution_window.show()
         else:
-            self.label.setText("请先选择一个文件夹！")
+            self.label.setText("chose one folder first plz")
             
     def openTPDWindow(self):
         if self.selected_folder:
             self.TPD_window = TPD_core(self.selected_folder)
             self.TPD_window.show()
         else:
-            self.label.setText("请先选择一个文件夹！")
+            self.label.setText("chose one folder first plz")
