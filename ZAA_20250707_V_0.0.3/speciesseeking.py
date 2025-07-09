@@ -323,21 +323,23 @@ def draw_reaction_network(transformations: dict,
     if G.number_of_nodes() == 0:
         print("[Warn] network is empty, skip drawing.")
         return
-
+    
     try:
-        if use_graphviz and G.number_of_nodes() > 4:
-            try:
-                layout_prog = "sfdp" if G.number_of_nodes() > 10 else "neato"
-                pos = nx.nx_agraph.graphviz_layout(G, prog=layout_prog)
-            except Exception:
-                pos = nx.spring_layout(G, seed=42,k=1.8)
-        else:
-            pos = nx.spring_layout(G, seed=42,k=1.8)
+        if summary_filter and highlight_species:
 
+            pos = nx.spring_layout(G, seed=42, k=1.5)
+        elif G.number_of_nodes() <= 10:
+
+            pos = nx.spring_layout(G, seed=42, k=1.5)
+        else:
+
+            pos = nx.spring_layout(G, seed=42, k=8.5,scale=5.0)
     except Exception as e:
-        print("⚠  Graphviz layout unavailable, fallback spring:", e)
-        k_val = 0.4 if G.number_of_nodes() <= 10 else 1.2 / math.sqrt(max(G.number_of_nodes(), 1))
-        pos = nx.spring_layout(G, seed=42, k=k_val, iterations=300)
+        print("[Fallback] layout failed, using basic spring layout:", e)
+        pos = nx.spring_layout(G, seed=42, k=2.0)
+
+
+
 
     NODE_SIZE = 2000
     EDGE_WIDTH = 5

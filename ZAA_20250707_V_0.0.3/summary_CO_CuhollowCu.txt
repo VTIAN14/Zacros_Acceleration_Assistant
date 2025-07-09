@@ -1,0 +1,11 @@
+Species: CO*_Cu(hollowCu)
+
+Generated (total +1):
+  CHO*_Cu->CO*_Cu+H*_Cu                              +1
+By reactant contributions:
+  CHO*_Cu(topCu,topCu)                               +1
+
+Consumed (total -1):
+  CO--*                                              -1
+By product contributions:
+  CO                                                 -1

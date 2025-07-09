@@ -47,6 +47,11 @@ class SpeciesEvolutionChaseWindow(QWidget):
         self.species_menu = QMenu(self)
         self.species_button.setMenu(self.species_menu)
         layout.addWidget(self.species_button)
+        
+        # 是否绘制全部路径网络图
+        self.chk_draw_full = QCheckBox("Draw full reaction network (ignore species)", checked=False)
+        layout.addWidget(self.chk_draw_full)
+
 
         self.populate_species()
 
@@ -141,9 +146,9 @@ class SpeciesEvolutionChaseWindow(QWidget):
         self.width_input.clearFocus()
         self.height_input.clearFocus()
         sel_species = [s for s, a in self.species_actions.items() if a.isChecked()]
-        if not sel_species:
-            self.output_area.setText("plz select one species at least :( ")
-            self.image_label.clear()
+        draw_full = self.chk_draw_full.isChecked()
+        if not sel_species and not draw_full:
+            self.output_area.setText("Please select a species or tick 'Draw full reaction network'")
             return
 
         ini, fin = self.ini_spin.value(), self.fin_spin.value()
@@ -185,9 +190,32 @@ class SpeciesEvolutionChaseWindow(QWidget):
     fig_width=self.width_input.value(),
     fig_height=self.height_input.value()
 )
-
+                    
             except Exception as e:
                 txt_out.append(f"❌ {sp} error plz contact Yuhong or wetian:\n{e}")
+
+# ➜ 如果选择画完整网络图（忽略 species）
+        if draw_full:
+            try:
+                with open(os.path.join(self.folder_path, "transformations.json"), "r", encoding="utf-8") as fh:
+                    transf = json.load(fh)
+        
+                png_path = self.tmp_dir / "reaction_network_full.png"
+                draw_reaction_network(
+                    transf,
+                    outfile_prefix=str(png_path.with_suffix("")),
+                    highlight_species=None,
+                    skip_self_loops=True,
+                    use_graphviz=True,
+                    summary_filter=None,  # 不筛选，只画全图
+                    fig_width=self.width_input.value(),
+                    fig_height=self.height_input.value()
+                )
+                txt_out.append("✅ Full reaction network drawn successfully.")
+            except Exception as e:
+                txt_out.append(f"❌ Failed to draw full network:\n{e}")
+
+
 
         self.output_area.setText("\n\n".join(txt_out))
 
