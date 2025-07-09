@@ -1,0 +1,361 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d2" for="edge" attr.name="direction" attr.type="string"/>
+<key id="d1" for="edge" attr.name="reaction" attr.type="string"/>
+<key id="d0" for="graph" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><data key="d0">Reaction Network (self-loops removed)</data>
+<node id="CH4_Cu"/>
+<node id="CH3*_Cu(hollowCu)"/>
+<node id="H*_Cu(hollowCu)"/>
+<node id="CH2*_Cu(hollowCu)"/>
+<node id="CH*_Cu(hollowCu)"/>
+<node id="C*_Cu(hollowCu)"/>
+<node id="O*_Cu(hollowCu)"/>
+<node id="OH*_Cu(hollowCu)"/>
+<node id="H2O*_Cu(topCu)"/>
+<node id="H2O"/>
+<node id="CO*_Cu(hollowCu)"/>
+<node id="CO2*_Cu(topCu)"/>
+<node id="CHO*_Cu(topCu,topCu)"/>
+<node id="CO"/>
+<node id="CO2"/>
+<node id="CH3O*_Cu(hollowCu)"/>
+<node id="CH2O*_Cu(hollowCu)"/>
+<node id="HCOO*_Cu(topCu,topCu)"/>
+<node id="H2COO*_Cu(topCu,topCu)"/>
+<edge source="CH4_Cu" target="CH3*_Cu(hollowCu)">
+  <data key="d1">CH4+OH*_Cu-&gt;CH3*_Cu+H20*_Cu_2</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH4_Cu" target="H*_Cu(hollowCu)">
+  <data key="d1">CH4-&gt;CH3*_Cu+H*_Cu_180_degree</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3*_Cu(hollowCu)" target="CH2*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+OH*_Cu-&gt;CH2*_Cu+H2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3*_Cu(hollowCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu-&gt;CH2*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3*_Cu(hollowCu)" target="CH3O*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+O*_Cu-&gt;CH3O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3*_Cu(hollowCu)" target="CH4_Cu">
+  <data key="d1">CH4+OH*_Cu-&gt;CH3*_Cu+H20*_Cu_2</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="OH*_Cu(hollowCu)">
+  <data key="d1">O+H--OH</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="H2O*_Cu(topCu)">
+  <data key="d1">OH+H--H2O</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CH4_Cu">
+  <data key="d1">CH4-&gt;CH3*_Cu+H*_Cu_180_degree</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CH3*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu-&gt;CH2*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CH2*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu-&gt;CH*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CH*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu-&gt;C*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CHO*_Cu(topCu,topCu)">
+  <data key="d1">CHO*_Cu-&gt;CO*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CH3O*_Cu(hollowCu)">
+  <data key="d1">CH3O*_Cu-&gt;CH2O*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="CH2O*_Cu(hollowCu)">
+  <data key="d1">CH2O*_Cu-&gt;CHO*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="HCOO*_Cu(topCu,topCu)">
+  <data key="d1">HCOO*_Cu-&gt;CO2*_Cu+H*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H*_Cu(hollowCu)" target="H2COO*_Cu(topCu,topCu)">
+  <data key="d1">H2COO*_Cu-&gt;HCOO*_Cu+H*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CH2*_Cu(hollowCu)" target="CH*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+OH*_Cu-&gt;CH*_Cu+H2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2*_Cu(hollowCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu-&gt;CH*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2*_Cu(hollowCu)" target="H2O*_Cu(topCu)">
+  <data key="d1">CH2*_Cu+OH*_Cu-&gt;CH*_Cu+H2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2*_Cu(hollowCu)" target="CH2O*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+O*_Cu-&gt;CH2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2*_Cu(hollowCu)" target="CH3*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+OH*_Cu-&gt;CH2*_Cu+H2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CH*_Cu(hollowCu)" target="C*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+OH*_Cu-&gt;C*_Cu+H2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH*_Cu(hollowCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu-&gt;C*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH*_Cu(hollowCu)" target="OH*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+O*_Cu-&gt;C*_Cu+OH*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH*_Cu(hollowCu)" target="H2O*_Cu(topCu)">
+  <data key="d1">CH*_Cu+OH*_Cu-&gt;C*_Cu+H2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH*_Cu(hollowCu)" target="CHO*_Cu(topCu,topCu)">
+  <data key="d1">CH*_Cu+O*_Cu-&gt;CHO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH*_Cu(hollowCu)" target="CH2*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+OH*_Cu-&gt;CH*_Cu+H2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="C*_Cu(hollowCu)" target="CO*_Cu(hollowCu)">
+  <data key="d1">C*_Cu+O*_Cu-&gt;CO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="C*_Cu(hollowCu)" target="CH*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+OH*_Cu-&gt;C*_Cu+H2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="OH*_Cu(hollowCu)">
+  <data key="d1">O+H--OH</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="CO*_Cu(hollowCu)">
+  <data key="d1">C*_Cu+O*_Cu-&gt;CO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="CO2*_Cu(topCu)">
+  <data key="d1">CO*_Cu+O*_Cu-&gt;CO2*_Cu+*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="CHO*_Cu(topCu,topCu)">
+  <data key="d1">CH*_Cu+O*_Cu-&gt;CHO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="CH3O*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+O*_Cu-&gt;CH3O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="CH2O*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+O*_Cu-&gt;CH2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="HCOO*_Cu(topCu,topCu)">
+  <data key="d1">CHO*_Cu+O*_Cu-&gt;HCOO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="O*_Cu(hollowCu)" target="H2COO*_Cu(topCu,topCu)">
+  <data key="d1">CH2O*_Cu+O*_Cu-&gt;H2COO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="OH*_Cu(hollowCu)" target="H2O*_Cu(topCu)">
+  <data key="d1">OH*_Cu+OH*_Cu-&gt;O*_Cu+H2O*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="OH*_Cu(hollowCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">O+H--OH</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="OH*_Cu(hollowCu)" target="CH*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+O*_Cu-&gt;C*_Cu+OH*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="OH*_Cu(hollowCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">O+H--OH</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2O*_Cu(topCu)" target="OH*_Cu(hollowCu)">
+  <data key="d1">OH*_Cu+OH*_Cu-&gt;O*_Cu+H2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2O*_Cu(topCu)" target="CH2*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+OH*_Cu-&gt;CH*_Cu+H2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2O*_Cu(topCu)" target="CH*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+OH*_Cu-&gt;C*_Cu+H2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2O*_Cu(topCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">OH+H--H2O</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2O*_Cu(topCu)" target="H2O">
+  <data key="d1">H2O--*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2O" target="H2O*_Cu(topCu)">
+  <data key="d1">H2O--*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CO*_Cu(hollowCu)" target="CO2*_Cu(topCu)">
+  <data key="d1">CO*_Cu+O*_Cu-&gt;CO2*_Cu+*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CO*_Cu(hollowCu)" target="C*_Cu(hollowCu)">
+  <data key="d1">C*_Cu+O*_Cu-&gt;CO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO*_Cu(hollowCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">C*_Cu+O*_Cu-&gt;CO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO*_Cu(hollowCu)" target="CHO*_Cu(topCu,topCu)">
+  <data key="d1">CHO*_Cu-&gt;CO*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO*_Cu(hollowCu)" target="CO">
+  <data key="d1">CO--*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO2*_Cu(topCu)" target="CO*_Cu(hollowCu)">
+  <data key="d1">CO*_Cu+O*_Cu-&gt;CO2*_Cu+*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO2*_Cu(topCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">CO*_Cu+O*_Cu-&gt;CO2*_Cu+*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO2*_Cu(topCu)" target="CO2">
+  <data key="d1">CO2--*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO2*_Cu(topCu)" target="HCOO*_Cu(topCu,topCu)">
+  <data key="d1">HCOO*_Cu-&gt;CO2*_Cu+H*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CHO*_Cu(topCu,topCu)" target="CO*_Cu(hollowCu)">
+  <data key="d1">CHO*_Cu-&gt;CO*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CHO*_Cu(topCu,topCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">CHO*_Cu-&gt;CO*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CHO*_Cu(topCu,topCu)" target="HCOO*_Cu(topCu,topCu)">
+  <data key="d1">CHO*_Cu+O*_Cu-&gt;HCOO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CHO*_Cu(topCu,topCu)" target="CH*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+O*_Cu-&gt;CHO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CHO*_Cu(topCu,topCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">CH*_Cu+O*_Cu-&gt;CHO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CHO*_Cu(topCu,topCu)" target="CH2O*_Cu(hollowCu)">
+  <data key="d1">CH2O*_Cu-&gt;CHO*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CO" target="CO*_Cu(hollowCu)">
+  <data key="d1">CO--*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CO2" target="CO2*_Cu(topCu)">
+  <data key="d1">CO2--*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3O*_Cu(hollowCu)" target="CH2O*_Cu(hollowCu)">
+  <data key="d1">CH3O*_Cu-&gt;CH2O*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3O*_Cu(hollowCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">CH3O*_Cu-&gt;CH2O*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH3O*_Cu(hollowCu)" target="CH3*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+O*_Cu-&gt;CH3O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CH3O*_Cu(hollowCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+O*_Cu-&gt;CH3O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CH2O*_Cu(hollowCu)" target="CHO*_Cu(topCu,topCu)">
+  <data key="d1">CH2O*_Cu-&gt;CHO*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2O*_Cu(hollowCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">CH2O*_Cu-&gt;CHO*_Cu+H*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2O*_Cu(hollowCu)" target="H2COO*_Cu(topCu,topCu)">
+  <data key="d1">CH2O*_Cu+O*_Cu-&gt;H2COO*_Cu</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="CH2O*_Cu(hollowCu)" target="CH2*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+O*_Cu-&gt;CH2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CH2O*_Cu(hollowCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">CH2*_Cu+O*_Cu-&gt;CH2O*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="CH2O*_Cu(hollowCu)" target="CH3O*_Cu(hollowCu)">
+  <data key="d1">CH3O*_Cu-&gt;CH2O*_Cu+H*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="HCOO*_Cu(topCu,topCu)" target="CO2*_Cu(topCu)">
+  <data key="d1">HCOO*_Cu-&gt;CO2*_Cu+H*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="HCOO*_Cu(topCu,topCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">HCOO*_Cu-&gt;CO2*_Cu+H*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="HCOO*_Cu(topCu,topCu)" target="CHO*_Cu(topCu,topCu)">
+  <data key="d1">CHO*_Cu+O*_Cu-&gt;HCOO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="HCOO*_Cu(topCu,topCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">CHO*_Cu+O*_Cu-&gt;HCOO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="HCOO*_Cu(topCu,topCu)" target="H2COO*_Cu(topCu,topCu)">
+  <data key="d1">H2COO*_Cu-&gt;HCOO*_Cu+H*</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2COO*_Cu(topCu,topCu)" target="HCOO*_Cu(topCu,topCu)">
+  <data key="d1">H2COO*_Cu-&gt;HCOO*_Cu+H*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="H2COO*_Cu(topCu,topCu)" target="H*_Cu(hollowCu)">
+  <data key="d1">H2COO*_Cu-&gt;HCOO*_Cu+H*</data>
+  <data key="d2">forward</data>
+</edge>
+<edge source="H2COO*_Cu(topCu,topCu)" target="CH2O*_Cu(hollowCu)">
+  <data key="d1">CH2O*_Cu+O*_Cu-&gt;H2COO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+<edge source="H2COO*_Cu(topCu,topCu)" target="O*_Cu(hollowCu)">
+  <data key="d1">CH2O*_Cu+O*_Cu-&gt;H2COO*_Cu</data>
+  <data key="d2">reverse</data>
+</edge>
+</graph></graphml>

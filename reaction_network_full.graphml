@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d2" for="edge" attr.name="direction" attr.type="string"/>
+<key id="d1" for="edge" attr.name="reaction" attr.type="string"/>
+<key id="d0" for="graph" attr.name="name" attr.type="string"/>
+<graph edgedefault="directed"><data key="d0">Reaction Network (auto-generated)</data>
+<node id="CH3*_Cu(hollowCu)"/>
+<node id="CH3O*_Cu(hollowCu)"/>
+<edge source="CH3*_Cu(hollowCu)" target="CH3O*_Cu(hollowCu)">
+  <data key="d1">CH3*_Cu+O*_Cu-&gt;CH3O*_Cu</data>
+  <data key="d2">fwd</data>
+</edge>
+</graph></graphml>

@@ -1,0 +1,9 @@
+Species: CH3*_Cu(hollowCu)
+
+Generated (total +0):
+By reactant contributions:
+
+Consumed (total -100):
+  CH3*_Cu+O*_Cu->CH3O*_Cu                            -100
+By product contributions:
+  CH3O*_Cu(hollowCu)                                 -100
