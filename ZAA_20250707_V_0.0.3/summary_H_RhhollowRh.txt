@@ -1,0 +1,17 @@
+Species: H*_Rh(hollowRh)
+
+Generated (total +152):
+  CH3*_Rh->CH2*_Rh+H*_Rh                             +54
+  CH2*_Rh->CH*_Rh+H*_Rh                              +49
+  CHO*_Rh->CO*_Rh+H*_Cu                              +49
+By reactant contributions:
+  CH3*_Rh(topRh)                                     +54
+  CH2*_Rh(hollowRh)                                  +49
+  CHO*_Rh(topRh)                                     +49
+
+Consumed (total -148):
+  CH4->CH3*_Rh+H*_Rh                                 -138
+  H*_diff_Cu_Rh                                      -10
+By product contributions:
+  CH4                                                -138
+  H*_Cu(hollowCu)                                    -10
