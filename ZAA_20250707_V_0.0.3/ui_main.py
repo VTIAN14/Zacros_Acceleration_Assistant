@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QComboBox, QMenuBar, QMenu, QAction
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog, QComboBox, QMenuBar, QMenu, QAction, QMessageBox
 from PyQt5.QtGui import QPixmap
 from ui_reaction_analysis import ReactionAnalysisApp
 from TPD_analysis import TPD_core
@@ -48,6 +48,13 @@ class MainWindow(QWidget):
         about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about_info)
         help_menu.addAction(about_action)
+
+        # **创建 Energetics Check 菜单**
+        energetics_menu = self.menu_bar.addMenu("Energetics Check")
+        energetics_action = QAction("Check Feasibility", self)
+        energetics_action.triggered.connect(self.openEnergeticsCheck)
+        energetics_menu.addAction(energetics_action)
+
         label = QLabel(self)
         pixmap = QPixmap("MA.jpg")
         label.setPixmap(pixmap)
@@ -63,10 +70,16 @@ class MainWindow(QWidget):
         evolution_action.triggered.connect(self.openSpeciesEvolutionWindow)
         evolution_menu.addAction(evolution_action)
 
-        pattern_menu = self.menu_bar.addMenu("Pattern Design")
+        # **创建 Pattern Design 菜单（改名并添加功能）**
+        pattern_menu = self.menu_bar.addMenu("Pattern Design and Feasible Check")
         pattern_action = QAction("Open Designer", self)
         pattern_action.triggered.connect(self.openPatternDesigner)
         pattern_menu.addAction(pattern_action)
+
+        feasible_action = QAction("Feasible Check", self)
+        feasible_action.triggered.connect(self.openEnergeticsCheck)
+        pattern_menu.addAction(feasible_action)
+
         self.setLayout(main_layout)
 
     def openFileDialog(self):
@@ -106,3 +119,18 @@ class MainWindow(QWidget):
             self.TPD_window.show()
         else:
             self.label.setText("chose one folder first plz")
+    
+    def openEnergeticsCheck(self):
+        if hasattr(self, 'selected_folder'):
+            try:
+                from feasible_checking_energetic_input import check_energetics_feasibility
+                alerts = check_energetics_feasibility(self.selected_folder)
+                if not alerts:
+                    msg = "All ECIs are covered "
+                else:
+                    msg = "\n".join(alerts)
+                QMessageBox.information(self, "Feasibility Check Result", msg)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error: {str(e)}")
+        else:
+            QMessageBox.warning(self, "Warning", "chose one folder first plz")

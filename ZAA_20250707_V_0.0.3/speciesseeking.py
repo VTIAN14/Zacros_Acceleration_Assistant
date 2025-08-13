@@ -269,18 +269,15 @@ def summarize_species_flow(species_key, merged_data, transformations,
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
-from typing import Optional, Union, Dict
 
-def draw_reaction_network(
-    transformations: Dict,  # 如果你希望更明确类型可用 Dict[str, Any]
-    outfile_prefix: str = "reaction_network",
-    highlight_species: Optional[str] = None,
-    skip_self_loops: bool = True,
-    use_graphviz: bool = True,
-    summary_filter: Optional[Dict] = None,
-    fig_width: Optional[float] = None,
-    fig_height: Optional[float] = None
-):
+def draw_reaction_network(transformations: dict,
+                          outfile_prefix: str = "reaction_network",
+                          highlight_species: str | None = None,
+                          skip_self_loops: bool = True,
+                          use_graphviz: bool = True,
+                          summary_filter: dict | None = None,
+                          fig_width: float | None = None,
+                          fig_height: float | None = None):
     """
     根据 transformations = {"forward": {...}, "reverse": {...}}
     画全量正/逆反应网络图，并导出：

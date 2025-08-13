@@ -15,18 +15,18 @@ from PyQt5.QtWidgets import QDoubleSpinBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5.QtWidgets import QDialog
-from typing import Optional, Dict
+
 
 class SpeciesEvolutionChaseWindow(QWidget):
     """主窗口"""
-    def __init__(self, folder_path: Optional[str] = None):
+    def __init__(self, folder_path: str | None = None):
         super().__init__()
         if folder_path is None:
             folder_path = self.ask_folder()
             if not folder_path:
                 sys.exit(0)
         self.folder_path = folder_path
-        self.species_actions: Dict[str, QAction] = {}
+        self.species_actions: dict[str, QAction] = {}
         self.tmp_dir = Path(tempfile.mkdtemp(prefix="sp_net_"))
         self.initUI()
     # ---------------- UI ----------------------------------------------------
