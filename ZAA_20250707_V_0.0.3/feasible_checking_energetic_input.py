@@ -15,7 +15,8 @@ def check_energetics_feasibility(selected_folder):
     
     clusters = parse_energetics_file(energetics_file)
     for c in clusters:
-        print(f"[{c['type']}] {c['name']} - energy: {c['energy']}")
+        dentate_info = f" (dentate={c.get('dentate', 1)})" if c.get('dentate', 1) > 1 else ""
+        print(f"[{c['type']}] {c['name']} - energy: {c['energy']}{dentate_info}")
     
     # =========================================================
     from typing import List, Dict, Any, Tuple, Set

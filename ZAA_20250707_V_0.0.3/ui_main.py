@@ -76,6 +76,10 @@ class MainWindow(QWidget):
         pattern_action.triggered.connect(self.openPatternDesigner)
         pattern_menu.addAction(pattern_action)
 
+        mechanism_action = QAction("Mechanism Design", self)
+        mechanism_action.triggered.connect(self.openMechanismDesigner)
+        pattern_menu.addAction(mechanism_action)
+
         feasible_action = QAction("Feasible Check", self)
         feasible_action.triggered.connect(self.openEnergeticsCheck)
         pattern_menu.addAction(feasible_action)
@@ -96,6 +100,14 @@ class MainWindow(QWidget):
             from pattern_design import PatternDesignWindow
             self.pattern_window = PatternDesignWindow(self.selected_folder)
             self.pattern_window.show()
+        else:
+            self.label.setText("chose one folder first plz")
+
+    def openMechanismDesigner(self):
+        if hasattr(self, 'selected_folder'):
+            from mechanism_design import MechanismDesignWindow
+            self.mechanism_window = MechanismDesignWindow(self.selected_folder)
+            self.mechanism_window.show()
         else:
             self.label.setText("chose one folder first plz")
 

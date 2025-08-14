@@ -125,6 +125,33 @@ def parse_energetics_file(filepath: str | Path) -> List[Dict[str, Any]]:
             if (m := re.match(r"^(\d+)\s+\S+", ln))
         }
         cl["type"] = "on-site" if len(ads_ids) == 1 else "eci"
+        
+        # ---- calculate dentate property ----
+        # Count how many lines have the same species name and same site ID (first number)
+        # For bi-dentate: same species appears multiple times with same site ID
+        species_count_per_site = {}
+        for ln in cl["raw_lattice_lines"]:
+            tokens = ln.split()
+            if not tokens or not tokens[0].isdigit():
+                continue
+            
+            site_id = int(tokens[0])
+            species = tokens[1] if len(tokens) > 1 else ""
+            
+            # Skip wildcards and vacancies for dentate counting
+            if species in [VACANCY_TOKEN, WILDCARD_TOKEN]:
+                continue
+            
+            key = (site_id, species)
+            if key not in species_count_per_site:
+                species_count_per_site[key] = 0
+            species_count_per_site[key] += 1
+        
+        # Calculate dentate value (maximum number of times any species appears for the same site ID)
+        if species_count_per_site:
+            cl["dentate"] = max(species_count_per_site.values())
+        else:
+            cl["dentate"] = 1  # default to 1 for empty or vacancy-only clusters
 
         clusters.append(cl)
 

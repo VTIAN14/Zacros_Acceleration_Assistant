@@ -15,7 +15,7 @@ from parse_lattice_block import parse_lattice_block
 from parse_energetics_file import parse_energetics_file
 from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtWidgets import QSizePolicy
-from PyQt5.QtWidgets import QDialog, QFormLayout, QDialogButtonBox, QDoubleSpinBox
+from PyQt5.QtWidgets import QDialog, QFormLayout, QDialogButtonBox, QDoubleSpinBox, QMessageBox
 from PyQt5.QtCore import Qt
 # 配置项
 from pattern_panel import PatternPanel
@@ -132,11 +132,40 @@ class LatticeCanvas(FigureCanvas):
             
             # 如果有激活的行，将点击的节点ID填入该行的 site_edit，并改变节点显示和颜色
             if hasattr(self.pattern_panel, 'active_row') and self.pattern_panel.active_row:
+                active_row = self.pattern_panel.active_row
+                
+                # 获取当前选中的 pattern 的信息
+                if hasattr(active_row, 'combo'):  # 主行
+                    selected_pattern = active_row.combo.currentText()
+                    target_site_edit = active_row.site_edit
+                elif hasattr(active_row, 'parent_row'):  # dentate行
+                    selected_pattern = active_row.parent_row.combo.currentText()
+                    target_site_edit = active_row.site_edit
+                else:
+                    return
+                
+                pattern_site_type = self.pattern_panel.species_lookup[selected_pattern]["site_type"]
+                
+                # 获取点击的节点的 site type
+                clicked_row = self.df[self.df.idx == clicked_node].iloc[0]
+                clicked_site_type = clicked_row.site
+                
+                # 检查 site type 是否匹配
+                if pattern_site_type != clicked_site_type:
+                    QMessageBox.warning(
+                        self,
+                        "Site Type 不匹配", 
+                        f"选择的物种 '{selected_pattern}' 需要 site type '{pattern_site_type}'，\n"
+                        f"但点击的位点是 site type '{clicked_site_type}'。\n"
+                        f"请选择匹配的位点。"
+                    )
+                    return
+                
+                # site type 匹配，继续原有逻辑
                 # 填入 site number
-                self.pattern_panel.active_row.site_edit.setText(str(clicked_node))
+                target_site_edit.setText(str(clicked_node))
                 
                 # 获取当前选中的 pattern 的 species 名字
-                selected_pattern = self.pattern_panel.active_row.combo.currentText()
                 species_name = self.pattern_panel.species_lookup[selected_pattern]["species"]
                 
                 # 初始化覆盖字典
@@ -161,8 +190,8 @@ class LatticeCanvas(FigureCanvas):
                 self.plot()
                 
                 # 取消选择状态
-                self.pattern_panel.active_row.select_btn.setChecked(False)
-                self.pattern_panel.active_row.select_btn.setText("📍")
+                active_row.select_btn.setChecked(False)
+                active_row.select_btn.setText("📍")
                 self.pattern_panel.active_row = None
 
     def get_nearest_node(self, mouse_xy):

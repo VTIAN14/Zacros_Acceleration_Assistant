@@ -89,9 +89,12 @@ class PatternPanel(QWidget):
         self.info_edit.setPlainText(text)
 
     class _Row(QWidget):
-        def __init__(self, pattern_names, parent_layout):
+        def __init__(self, pattern_names, parent_layout, parent_panel):
             super().__init__()
             self.layout = QHBoxLayout(self)
+            self.parent_panel = parent_panel
+            self.parent_layout = parent_layout
+            self.dentate_rows = []  # 存储额外的dentate行
             
             # Select Site 按钮（放在最前面）
             self.select_btn = QPushButton("📍")
@@ -101,6 +104,7 @@ class PatternPanel(QWidget):
             self.layout.addWidget(self.select_btn)
             
             self.combo = QComboBox(); self.combo.addItems(pattern_names)
+            self.combo.currentTextChanged.connect(self.on_pattern_changed)  # 添加监听器
             self.site_edit = QLineEdit("1"); self.site_edit.setMaximumWidth(60)
             self.site_edit.setPlaceholderText("site #")
             self.layout.addWidget(self.combo)
@@ -112,43 +116,161 @@ class PatternPanel(QWidget):
             font = self.del_btn.font()
             font.setPointSize(18)
             self.del_btn.setFont(font)
-            self.del_btn.clicked.connect(lambda: self._remove_self(parent_layout))
+            self.del_btn.clicked.connect(lambda: self._remove_self())
             self.layout.addWidget(self.del_btn)
+
+        def on_pattern_changed(self, pattern_name):
+            """当选择的pattern改变时，更新dentate行"""
+            # 先移除所有额外的dentate行
+            self.remove_dentate_rows()
+            
+            # 获取新pattern的dentate值
+            dentate = 1
+            for pattern in self.parent_panel.on_site_patterns:
+                if pattern["name"] == pattern_name:
+                    dentate = pattern.get("dentate", 1)
+                    break
+            
+            # 如果dentate > 1，创建额外的行
+            if dentate > 1:
+                self.create_dentate_rows(dentate - 1)  # 减1因为第一行已存在
+
+        def create_dentate_rows(self, extra_count):
+            """创建额外的dentate行"""
+            current_index = self.parent_layout.indexOf(self)
+            
+            for i in range(extra_count):
+                dentate_row = PatternPanel._DentateRow(i + 2, self)  # 从第2个dentate开始
+                self.dentate_rows.append(dentate_row)
+                self.parent_layout.insertWidget(current_index + 1 + i, dentate_row)
+
+        def remove_dentate_rows(self):
+            """移除所有额外的dentate行"""
+            for row in self.dentate_rows:
+                self.parent_layout.removeWidget(row)
+                row.setParent(None)
+                row.deleteLater()
+            self.dentate_rows.clear()
 
         def activate_select(self, checked):
             # 通知父级 PatternPanel 激活选择模式，并记录是哪一行
-            parent_panel = self.parent().parent().parent().parent()  # 找到 PatternPanel
+            parent_panel = self.parent_panel
             if hasattr(parent_panel, 'activate_row_select'):
                 parent_panel.activate_row_select(self, checked)
 
         def get_values(self):
-            return self.combo.currentText(), self.site_edit.text().strip()
+            """返回主行的值以及所有dentate行的值"""
+            values = [(self.combo.currentText(), self.site_edit.text().strip())]
+            for dentate_row in self.dentate_rows:
+                values.append((self.combo.currentText(), dentate_row.site_edit.text().strip()))
+            return values
             
-        def _remove_self(self, layout):
-            layout.removeWidget(self)
+        def _remove_self(self):
+            self.remove_dentate_rows()  # 先移除dentate行
+            self.parent_layout.removeWidget(self)
             self.setParent(None)
             self.deleteLater()
 
+    class _DentateRow(QWidget):
+        """额外的dentate位点选择行"""
+        def __init__(self, dentate_num, parent_row):
+            super().__init__()
+            self.layout = QHBoxLayout(self)
+            self.parent_row = parent_row
+            self.dentate_num = dentate_num
+            
+            # 缩进显示
+            spacer = QLabel("    ")
+            self.layout.addWidget(spacer)
+            
+            # Select Site 按钮
+            self.select_btn = QPushButton("📍")
+            self.select_btn.setFixedSize(32, 32)
+            self.select_btn.setCheckable(True)
+            self.select_btn.clicked.connect(self.activate_select)
+            self.layout.addWidget(self.select_btn)
+            
+            # 显示当前是第几个dentate
+            label = QLabel(f"Site {dentate_num}:")
+            label.setFixedWidth(50)
+            self.layout.addWidget(label)
+            
+            self.site_edit = QLineEdit(); self.site_edit.setMaximumWidth(60)
+            self.site_edit.setPlaceholderText("site #")
+            self.layout.addWidget(self.site_edit)
+            
+            # 填充剩余空间
+            self.layout.addStretch()
+
+        def activate_select(self, checked):
+            parent_panel = self.parent_row.parent_panel
+            if hasattr(parent_panel, 'activate_row_select'):
+                parent_panel.activate_row_select(self, checked)
+
     def add_row(self):
-        row = PatternPanel._Row([c["name"] for c in self.on_site_patterns], self.row_container)
+        row = PatternPanel._Row([c["name"] for c in self.on_site_patterns], self.row_container, self)
         self.row_container.addWidget(row)
+
+    def activate_row_select(self, row, checked):
+        """激活某一行的选择模式"""
+        # 取消其他行的选择状态
+        for i in range(self.row_container.count()):
+            widget = self.row_container.itemAt(i).widget()
+            if widget and hasattr(widget, 'select_btn') and widget != row:
+                widget.select_btn.setChecked(False)
+                widget.select_btn.setText("📍")
+                # 也要检查dentate行
+                if hasattr(widget, 'dentate_rows'):
+                    for dentate_row in widget.dentate_rows:
+                        if dentate_row.select_btn.isChecked():
+                            dentate_row.select_btn.setChecked(False)
+                            dentate_row.select_btn.setText("📍")
+        
+        if checked:
+            self.active_row = row
+            row.select_btn.setText("👆")
+        else:
+            self.active_row = None
+            row.select_btn.setText("📍")
 
     def save_cluster(self):
         rows = [self.row_container.itemAt(i).widget() for i in range(self.row_container.count())]
-        chosen = [r.get_values() for r in rows if r.get_values()[1]]
-        if len(chosen) < 2:
+        # 只考虑主行（_Row类型），不是_DentateRow
+        main_rows = [r for r in rows if isinstance(r, PatternPanel._Row)]
+        
+        # 收集所有的(pattern_name, site_number)对
+        all_choices = []
+        for row in main_rows:
+            row_values = row.get_values()  # 返回列表：[(pattern, site1), (pattern, site2), ...]
+            for pattern, site in row_values:
+                if site.strip():  # 只包含非空的site
+                    all_choices.append((pattern, site.strip()))
+        
+        if len(all_choices) < 2:
             QMessageBox.warning(self, "Cluster Builder", "Please specify at least TWO sites (pattern + site number).")
             return
+        
         try:
-            site_nums = [int(num) for _, num in chosen]
+            site_nums = [int(num) for _, num in all_choices]
         except ValueError:
             QMessageBox.warning(self, "Cluster Builder", "Site numbers must be integers.")
             return
+        
         if len(set(site_nums)) != len(site_nums):
             QMessageBox.warning(self, "Cluster Builder", "Duplicate site numbers detected. Please use unique site IDs.")
             return
-        names = "+".join([name.split("*")[0] + "*" for name, _ in chosen])
-        n_sites = len(site_nums)
+        
+        # 按pattern分组来生成名称
+        unique_patterns = []
+        for pattern, _ in all_choices:
+            pattern_base = pattern.split("*")[0] + "*"
+            if pattern_base not in unique_patterns:
+                unique_patterns.append(pattern_base)
+        names = "+".join(unique_patterns)
+        
+        # 计算总的sites数量（就是所有选择的位点数量）
+        total_sites = len(all_choices)
+        
         df = self.canvas.df
         
         # 直接调用 build_graph 函数
@@ -179,15 +301,27 @@ class PatternPanel(QWidget):
         neighboring = " ".join(sorted(set(neighboring_pairs)))
         lattice_state_lines = []
         site_type_tokens = []
-        for i, (pat_name, site_num) in enumerate(chosen, start=1):
+        
+        # 按pattern分组来生成dentate编号
+        pattern_dentate_counter = {}
+        
+        for i, (pat_name, site_num) in enumerate(all_choices, start=1):
             site_dict = self.species_lookup[pat_name]
             species = site_dict["species"]
-            site_type_tokens.append(site_dict["site_type"])
-            lattice_state_lines.append(f"    {i} {species:<8} {site_num}")
+            site_type = site_dict["site_type"]
+            
+            # 计算当前pattern的dentate编号
+            if pat_name not in pattern_dentate_counter:
+                pattern_dentate_counter[pat_name] = 0
+            pattern_dentate_counter[pat_name] += 1
+            dentate_num = pattern_dentate_counter[pat_name]
+            
+            lattice_state_lines.append(f"    {i} {species:<8} {dentate_num}")
+            site_type_tokens.append(site_type)
         cluster_eng = self.eng_input.text().strip() or "0.0"
         output = (
             f"cluster {names}\n"
-            f"  sites {n_sites}\n"
+            f"  sites {total_sites}\n"
             f"  neighboring {neighboring}\n"
             f"  lattice_state\n"
             + "\n".join(lattice_state_lines)
